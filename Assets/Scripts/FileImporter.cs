@@ -6,8 +6,8 @@ using SFB; // Simple File Browser plugin
 public class FileImporter : MonoBehaviour
 {
     [SerializeField] private SongSaveSystem saveSystem = new SongSaveSystem();
-
-    void Awake()
+    [SerializeField] private PopulateSongList songList;
+    void Start()
     {
         GameManager.instance.importedFiles = saveSystem.Load();
     }
@@ -47,7 +47,8 @@ public class FileImporter : MonoBehaviour
             item.added = true;
 
             GameManager.instance.importedFiles.Add(item);
-
+            Debug.Log("added song" + item.Title);
+            songList.RefreshList();
             saveSystem.Save(GameManager.instance.importedFiles);
         }
     }

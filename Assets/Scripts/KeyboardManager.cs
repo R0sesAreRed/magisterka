@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using static KeyboardManager;
 
 public class KeyboardManager : MonoBehaviour
 {
@@ -21,6 +22,8 @@ public class KeyboardManager : MonoBehaviour
     private Dictionary<GameManager.NK, Action<InputAction.CallbackContext>> canceledDelegates; //s³ownik przechowuj¹cy delegaty dla zdarzeñ "canceled"
     private Dictionary<GameManager.NK, float> lastCollisionTime = new(); //s³ownik przechowuj¹cy czas ostatniej kolizji dla ka¿dej nuty
     private Dictionary<GameManager.NK, float> lastKeyPressTime = new(); //s³ownik przechowuj¹cy czas ostatniego naciœniêcia klawisza dla ka¿dej nuty
+
+    private Dictionary<GameManager.NK, NoteTiming> noteTimings = new();
 
     public float ScreenHeight = 0;
     private void Awake()
@@ -53,16 +56,22 @@ public class KeyboardManager : MonoBehaviour
                 detector.note = (GameManager.NK)i;
             }
         }
+
+
     }
 
-    //private IEnumerator Start()
-    //{
-    //    yield return null; // odczekaj jedn¹ klatkê, a¿ layout siê przeliczy
-    //    for (int i = 0; i < Keys.Length && i < Enum.GetValues(typeof(GameManager.NK)).Length; i++)
-    //    {
-    //        Debug.Log(Keys[i].transform.position.x);
-    //    }
-    //}
+    private void Start()
+    {
+        foreach (var noteData in GameManager.instance.CurrMidiNotes) 
+        {
+            noteTimings[noteData.Note] = new NoteTiming
+            {
+                noteStartTime = (noteData.StartTime / 1000.0) + 1.5f, // PRZY ZMIANIE TEMPA LOTU NUT TO TRZEBA ZMIENIÆ. NAJLEPIEJ W OGOLE TO ZROBIC ZALEZNE (3/4 * tempo spadania -> obecnie 2)
+                noteLength = (noteData.Length / 1000.0)
+            };
+            Debug.Log($"Zarejestrowano nutê {noteData.Note} z czasem startu {noteTimings[noteData.Note].noteStartTime} i d³ugoœci¹ {noteTimings[noteData.Note].noteLength}");
+        }
+    }
 
 
     private void OnEnable() //przypisuje funkcje
@@ -101,35 +110,66 @@ public class KeyboardManager : MonoBehaviour
         GameManager.instance.inputActions.Piano.Disable();
     }
 
+    
 
-    private void OnKeyPerformed(GameManager.NK note, InputAction.CallbackContext ctx) //rozpoczyna granie nuty przy wciœniêciu klawisza do przypiêcia
+    private void OnKeyPerformed(GameManager.NK note, InputAction.CallbackContext ctx)
     {
         KeyPressColor(ctx, note);
-        float pressTime = Time.time;
-        lastKeyPressTime[note] = pressTime;
-        //Debug.Log($"Klawisz {note} naciœniêty.");
 
-        if (lastCollisionTime.TryGetValue(note, out float collisionTime))
+        double hitTime = GetCurrentSongTime(); // np. Time.time - songStartTime
+        if (noteTimings.TryGetValue(note, out var timing))
         {
-            float delta = pressTime - collisionTime;
-            if (delta >= -0.1f && delta <= 0.1f)
-            {
-                GameUIManager.instance.Score += 10;
-                lastCollisionTime.Remove(note); //zapobiega podwójnym punktom
-                //Debug.Log($"Punkty: {GameManager.instance.Score}");
-            }
-            else
-            {
-                //Debug.Log($"Klawisz {note} naciœniêty {delta:F3}s po kolizji (za wczeœnie/za póŸno)");
-            }
-            //Debug.Log($"Czas naciœniêcia: {pressTime:F3}s, Czas kolizji: {collisionTime:F3}s, Ró¿nica: {delta:F3}s");
+            timing.hitTime = hitTime;
         }
     }
-    private void OnKeyCanceled(GameManager.NK note, InputAction.CallbackContext ctx) //zatrzymuje gran¹ nutê przy wypuszczeniu klawisza do przypiêcia
+
+    private void OnKeyCanceled(GameManager.NK note, InputAction.CallbackContext ctx)
     {
         KeyReleaseColor(ctx, note);
 
+        double releaseTime = GetCurrentSongTime();
+        if (noteTimings.TryGetValue(note, out var timing) && timing.hitTime.HasValue && !timing.scored)
+        {
+            timing.releaseTime = releaseTime;
+
+            // Oblicz wynik
+            int score = GameUIManager.instance.CalculateScore(
+                timing.hitTime.Value,
+                timing.noteStartTime,
+                timing.releaseTime.Value,
+                timing.noteLength,
+                note
+            );
+
+            // Dodaj punkty do wyniku
+            GameUIManager.instance.Score += score;
+
+            // Oznacz nutê jako rozliczon¹
+            timing.scored = true;
+
+            // (opcjonalnie) wyczyœæ dane, jeœli nie chcesz liczyæ ponownie
+            timing.hitTime = null;
+            timing.releaseTime = null;
+        }
     }
+
+
+
+    public class NoteTiming
+    {
+        public double noteStartTime;
+        public double noteLength;
+        public double? hitTime;
+        public double? releaseTime;
+        public bool scored = false; // czy ju¿ przyznano punkty za tê nutê
+    }
+
+    private double GetCurrentSongTime()
+    {
+        return Time.time - GameManager.instance.songStartTime;
+    }
+
+
 
     private void KeyPressColor(InputAction.CallbackContext context, GameManager.NK note)
     {
@@ -159,11 +199,22 @@ public class KeyboardManager : MonoBehaviour
 
     public void CheckMissedNote(GameManager.NK note, float exitTime)
     {
-        // Jeœli w s³owniku lastCollisionTime nadal jest wpis dla tej nuty,
-        // oznacza to, ¿e nie by³o poprawnego naciœniêcia w oknie czasowym
         if (lastCollisionTime.ContainsKey(note))
         {
-            //Debug.Log($"Nuta {note} zosta³a pominiêta! (miss)");
+            if (noteTimings.TryGetValue(note, out var timing) && timing.hitTime == null && !timing.scored)
+            {
+                int score = GameUIManager.instance.CalculateScore(
+                    double.NaN,
+                    timing.noteStartTime,
+                    double.NaN,
+                    timing.noteLength,
+                    note
+                );
+                GameUIManager.instance.Score += score;
+                timing.scored = true;
+                Debug.Log($"MISS: Nuta {note} zosta³a ca³kowicie pominiêta, punkty: {score}");
+            }
+
             lastCollisionTime.Remove(note);
         }
     }

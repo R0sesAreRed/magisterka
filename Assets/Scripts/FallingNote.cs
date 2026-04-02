@@ -7,7 +7,7 @@ public class FallingNote : MonoBehaviour
     private float noteLength;    // w sekundach
     private float fallSpeed;     // px/s
     private float spawnY;        // pozycja Y, z której nuta startuje
-    private float destroyY = -1500f; //temporary
+    private float destroyY = -4000f; //temporary
     public void Init(double start, double len, float spawnY)
     {
         noteStartTime = (float)start / 1000f; // zamiana ms na s
@@ -30,7 +30,8 @@ public class FallingNote : MonoBehaviour
         Vector3 pos = transform.localPosition;
         pos.y = newY;
         transform.localPosition = pos;
-        if (newY < destroyY)
+        //float noteHeight = noteLength * fallSpeed;
+        if (newY < destroyY) //zmienic to na cos co ma sens
             Destroy(gameObject);
     }
 }

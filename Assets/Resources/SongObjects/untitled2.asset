@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9d8a497be3fc34e408e07f9025a11fb2, type: 3}
-  m_Name: KOTEK 3
+  m_Name: untitled2
   m_EditorClassIdentifier: 
   Title: Untitled2
-  FilePath: C:\Users\pawel\Desktop\magisterka\Assets\Midis\Untitled2.MID
+  FilePath: Assets/Midis/Untitled2.mid
   HighScore: 0
   MaxScore: 100
   added: 0

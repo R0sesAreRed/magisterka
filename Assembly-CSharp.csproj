@@ -64,10 +64,12 @@
     <Compile Include="Assets\Scripts\SelectSongItem.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserWindows.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowser.cs" />
+    <Compile Include="Assets\Scripts\AchievementData.cs" />
     <Compile Include="Assets\Scripts\KeyCollisionDetector.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleSaveFileText.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserEditor.cs" />
     <Compile Include="Assets\Scripts\SelectSongItemData.cs" />
+    <Compile Include="Assets\Scripts\PopulateSongList.cs" />
     <Compile Include="Assets\Scripts\KeyboardManager.cs" />
     <Compile Include="Assets\Scripts\FallingNote.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\IStandaloneFileBrowser.cs" />
@@ -76,9 +78,11 @@
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserMac.cs" />
     <Compile Include="Assets\Scripts\SongDatabase.cs" />
     <Compile Include="Assets\Scripts\SceneRouter.cs" />
+    <Compile Include="Assets\Scripts\AccountHandler.cs" />
     <Compile Include="Assets\Melanchall\DryWetMIDI\Demo\DemoScript.cs" />
     <Compile Include="Assets\InputSystem_Actions.cs" />
     <Compile Include="Assets\Scripts\GameUIManager.cs" />
+    <Compile Include="Assets\Scripts\SelectSongItemView.cs" />
     <Compile Include="Assets\Scripts\MidiReader.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleOpenFileTextMultiple.cs" />
     <Compile Include="Assets\Scripts\FalingNotesSpawner.cs" />
@@ -110,6 +114,7 @@
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\Melanchall\DryWetMIDI\Melanchall_DryWetMidi_Native32.dll" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\plan semestr letni.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Melanchall\DryWetMIDI\Melanchall_DryWetMidi_Native64.dll" />
@@ -595,6 +600,10 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@60ef35ffd3cd\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Ookii.Dialogs">
+      <HintPath>Assets\StandaloneFileBrowser\Plugins\Ookii.Dialogs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Melanchall.DryWetMidi">
       <HintPath>Assets\Melanchall\DryWetMIDI\Melanchall.DryWetMidi.dll</HintPath>
       <Private>False</Private>
@@ -605,10 +614,6 @@
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>Library\PackageCache\com.unity.nuget.mono-cecil@d6f9955a5d5f\Mono.Cecil.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Ookii.Dialogs">
-      <HintPath>Assets\StandaloneFileBrowser\Plugins\Ookii.Dialogs.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Windows.Forms">

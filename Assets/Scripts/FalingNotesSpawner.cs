@@ -96,11 +96,12 @@ public class FalingNotesSpawner : MonoBehaviour
         var keyRect = KeyboardManager.instance.KeyVisualsDict[noteData.Note]?.GetComponent<RectTransform>();
         float noteWidth = keyRect != null ? keyRect.rect.width : 40f; // domyœlna szerokoœæ, jeœli brak
 
-        Vector3 spawnPos = new Vector3(xPos, 0, 0f);
+        Vector3 spawnPos = new Vector3(xPos, 1000, 0f);
 
         // 6. Stwórz nutê
         GameObject noteObj = Instantiate(notePrefab, spawnPos, Quaternion.identity, notesParent);
-        Debug.Log($"Spawnuje nutê: {noteData.Note} o czasie: {noteData.StartTime} is d³ugoœci : {noteData.Length}");
+        //Debug.Log($"Spawnuje nutê: {noteData.Note} o czasie: {noteData.StartTime} is d³ugoœci : {noteData.Length}");
+        //StartCoroutine(LogWhenNoteShouldBePlayed(noteData));
         noteObj.name = $"{noteData.Note} {noteData.StartTime} {noteData.Length}";
         // 7. Ustaw rozmiar nuty
         var noteRect = noteObj.GetComponent<RectTransform>();
@@ -117,6 +118,13 @@ public class FalingNotesSpawner : MonoBehaviour
         var fallingNote = noteObj.GetComponent<FallingNote>();
         if (fallingNote != null)
             fallingNote.Init(noteData.StartTime, noteData.Length, 0);
+    }
+    public IEnumerator LogWhenNoteShouldBePlayed(GameManager.Notes noteData)
+    {
+        yield return new WaitForSeconds(1.5f);
+        Debug.Log($"Nuta {noteData.Note} powinna byæ zagrana teraz!");
+        yield return new WaitForSeconds((float)noteData.Length/1000f);
+        Debug.Log($"Nuta {noteData.Note} powinna zostaæ wypuszczona teraz!");
     }
 
     public void PauseResume(InputAction.CallbackContext ctx)

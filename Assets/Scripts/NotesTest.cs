@@ -99,7 +99,7 @@ public class NotesTest : MonoBehaviour
 
     private void PlayNote(InputAction.CallbackContext context, GameManager.NK note, float freq)
     {
-        Debug.Log("Playing Note: " + note);
+        //Debug.Log("Playing Note: " + note);
         if (ASsDict[note] == null)
         {
             ASsDict[note] = gameObject.AddComponent<AudioSource>();

@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public string SelectedAccount; 
+
     public static GameManager instance;
     public InputSystem_Actions inputActions;
 
@@ -12,6 +14,8 @@ public class GameManager : MonoBehaviour
     public bool IsPaused = false;
     public List<SelectSongItem> importedFiles = new List<SelectSongItem>();
     [SerializeField] private SongSaveSystem saveSystem;
+    public SelectSongItem currentSong;
+    public float longestNoteLength;
 
 
     public float songStartTime;

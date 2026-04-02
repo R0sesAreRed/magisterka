@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: KOTEK
   m_EditorClassIdentifier: 
   Title: KOTEK
-  FilePath: C:\Users\pawel\Desktop\magisterka\Assets\Midis\KOTEK.MID
+  FilePath: Assets/Midis/KOTEK.mid
   HighScore: 0
   MaxScore: 100
   added: 0

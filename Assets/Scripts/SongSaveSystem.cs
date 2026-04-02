@@ -6,7 +6,10 @@ public class SongSaveSystem
 {
     private string GetPath()
     {
-        return Path.Combine(Application.persistentDataPath, "songs.json");
+        if (GameManager.instance.SelectedAccount != null)
+            return Path.Combine(Application.persistentDataPath, $"{GameManager.instance.SelectedAccount}.json");
+        else
+            return Path.Combine(Application.persistentDataPath, "default_songs.json");
     }
 
     public void Save(List<SelectSongItem> items)

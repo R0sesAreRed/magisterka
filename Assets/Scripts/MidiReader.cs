@@ -25,12 +25,13 @@ public class MidiReader : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        midiPath = SetMidiPath("Assets/Midis/Untitled4.mid");
+        
     }
-
 
     void Start()
     {
+        midiPath = SetMidiPath(GameManager.instance.currentSong.FilePath);
+        Debug.Log($"Midi path set to: {midiPath}");
         GameManager.instance.CurrMidiNotes = ReadMidiNotes(midiPath);
         GameManager.instance.CurrMidiNotes = CleanUpMidi(GameManager.instance.CurrMidiNotes);
         //foreach (var note in GameManager.instance.CurrMidiNotes)
@@ -87,6 +88,8 @@ public class MidiReader : MonoBehaviour
         // Posortuj koñcowo po czasie rozpoczêcia
         result = result.OrderBy(n => n.StartTime).ToList();
         GameUIManager.instance.totalSongTime = result.Last().StartTime + result.Last().Length + 1500; //ustaw czas trwania piosenki na czas zakoñczenia ostatniej nuty
+        GameManager.instance.longestNoteLength = (float)result.Max(n => n.Length); //ustaw d³ugoœæ najd³u¿szej nuty
+        Debug.Log("longest note" + GameManager.instance.longestNoteLength);
         return result;
     }
 
