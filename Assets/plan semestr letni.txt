@@ -8,26 +8,28 @@
 1:praca nad aplikacją edukacyjną
 -tryby gry:
 	po nucie
++	spadające klocki
 	spadające klocki + metronom
 -grywalizacja:
 	poziomy
 +	punkty
-50/50	natychmiastowy feedback (ok, good, perfect, życia)
++?	natychmiastowy feedback (ok, good, perfect, życia)
 	cyfrowa waluta
 	Zadania
-	achievementy (badge)
+50/50	achievementy (badge)
 	skinki
 +	paski progresu
 	leaderboard
 -ui:
-	wybieranie trybu gry 
-	osiągnięcia
-50/50	ustawienia 
-	tablica wyników
+->	wybieranie trybu gry 
+->	osiągnięcia
+50/50->	ustawienia 
+->	tablica wyników
 -dodatki do gameplayu:
 +	natychmistowy feedback
 	skiny
 	wyświetlanie powiadomień o osiągnięciach i zadaniach
+->	firebase i zbieranie danych
 		
 
 26.03:

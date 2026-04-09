@@ -63,12 +63,14 @@
   <ItemGroup>
     <Compile Include="Assets\Scripts\SelectSongItem.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserWindows.cs" />
+    <Compile Include="Assets\Scripts\AchievementManager.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowser.cs" />
     <Compile Include="Assets\Scripts\AchievementData.cs" />
     <Compile Include="Assets\Scripts\KeyCollisionDetector.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleSaveFileText.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserEditor.cs" />
     <Compile Include="Assets\Scripts\SelectSongItemData.cs" />
+    <Compile Include="Assets\Scripts\SettingManager.cs" />
     <Compile Include="Assets\Scripts\PopulateSongList.cs" />
     <Compile Include="Assets\Scripts\KeyboardManager.cs" />
     <Compile Include="Assets\Scripts\FallingNote.cs" />

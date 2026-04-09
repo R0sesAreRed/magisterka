@@ -7,4 +7,15 @@ public class AchievementData : ScriptableObject
     public string title;
     public string description;
     public int targetValue;
+    public AchievementRestriction rest;
+}
+
+public enum AchievementRestriction
+{
+    Points,
+    HitQuality,
+    Shop,
+    Rewards,
+    Quests,
+    Scorboard
 }

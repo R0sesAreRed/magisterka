@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 0fae2ef05a80b3d4995bf3d17a271a8c
+guid: 4c090b541ec592c44bfa77df7fe01d78
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4125671744825030999
-    second: "Bez\_tytu\u0142u_0"
+      213: -5538710505629438071
+    second: hearth mask_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "Bez\_tytu\u0142u_0"
+      name: hearth mask_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 94
-        height: 89
+        width: 16
+        height: 16
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 9a686d5286baeb6c0800000000000000
-      internalID: -4125671744825030999
+      spriteID: 98fab36f32c8223b0800000000000000
+      internalID: -5538710505629438071
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "Bez\_tytu\u0142u_0": -4125671744825030999
+      hearth mask_0: -5538710505629438071
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

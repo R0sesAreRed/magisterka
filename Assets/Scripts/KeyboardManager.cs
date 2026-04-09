@@ -132,7 +132,6 @@ public class KeyboardManager : MonoBehaviour
         {
             timing.releaseTime = releaseTime;
 
-            // Oblicz wynik
             int score = GameUIManager.instance.CalculateScore(
                 timing.hitTime.Value,
                 timing.noteStartTime,
@@ -141,13 +140,8 @@ public class KeyboardManager : MonoBehaviour
                 note
             );
 
-            // Dodaj punkty do wyniku
             GameUIManager.instance.Score += score;
-
-            // Oznacz nutê jako rozliczon¹
             timing.scored = true;
-
-            // (opcjonalnie) wyczyœæ dane, jeœli nie chcesz liczyæ ponownie
             timing.hitTime = null;
             timing.releaseTime = null;
         }
@@ -212,6 +206,7 @@ public class KeyboardManager : MonoBehaviour
                 );
                 GameUIManager.instance.Score += score;
                 timing.scored = true;
+                GameUIManager.instance.HealthPoints -= 1000; //TESTOWAÆ JAK BEDZIE PIANINKO
                 Debug.Log($"MISS: Nuta {note} zosta³a ca³kowicie pominiêta, punkty: {score}");
             }
 
