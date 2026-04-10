@@ -25,6 +25,7 @@
 ->	osiągnięcia
 50/50->	ustawienia 
 ->	tablica wyników
+	sklep
 -dodatki do gameplayu:
 +	natychmistowy feedback
 	skiny

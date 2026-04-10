@@ -1,4 +1,5 @@
 using Melanchall.DryWetMidi.Interaction;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -26,20 +27,17 @@ public class GameUIManager : MonoBehaviour
                 return;
 
             healthPoints = clamped;
+            Debug.Log("healthPoints: " + healthPoints);
             for (int i = 0; i < hearths.Length; i++)
             {
                 float hearthValue = Mathf.Clamp(healthPoints - i * 1000, 0, 1000) / 1000f;
-
+                Debug.Log("hearthValue: " + hearthValue);
                 Transform mask = hearths[i].transform.Find("HearthMask");
                 if (mask != null)
                 {
-                    Transform fill = mask.Find("HearthFill");
-                    if (fill != null)
-                    {
-                        Image fillImage = fill.GetComponent<Image>();
-                        if (fillImage != null)
-                            fillImage.fillAmount = hearthValue;
-                    }
+                    Image maskImage = mask.GetComponent<Image>();
+                    if (maskImage != null)
+                        maskImage.fillAmount = hearthValue;
                 }
                 Transform outline = hearths[i].transform.Find("HearthOutline");
                 if (outline != null)

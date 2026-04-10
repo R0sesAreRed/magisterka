@@ -3161,7 +3161,10 @@ MonoBehaviour:
   scoreText: {fileID: 1078833586}
   progressBar: {fileID: 31226774}
   feedbackText: {fileID: 1781641531}
-  hearths: []
+  hearths:
+  - {fileID: 375611196}
+  - {fileID: 272830402}
+  - {fileID: 224853532}
   totalSongTime: 0
   songTimePlayed: 0
 --- !u!1 &456483604
