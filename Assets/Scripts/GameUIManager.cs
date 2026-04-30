@@ -104,6 +104,8 @@ public class GameUIManager : MonoBehaviour
             //Debug.Log("Perfekcyje trafienie");
             feedbackText.text = "Perfekcyjnie!";
             HealthPoints += 100;
+            GameEvents.OnPerfectHit?.Invoke(1);
+            GameEvents.OnHit?.Invoke(1);
             return 100;
         }
         else if (timeDifference+releaseDifference <= 0.3f) // dobre trafienie
@@ -111,6 +113,8 @@ public class GameUIManager : MonoBehaviour
             //Debug.Log("Dobre trafienie");
             feedbackText.text = "Dobrze!";
             HealthPoints += 70;
+            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
+            GameEvents.OnHit?.Invoke(1);
             return 70;
         }
         else if (timeDifference + releaseDifference <= 0.45f) // s³abe trafienie
@@ -118,6 +122,8 @@ public class GameUIManager : MonoBehaviour
             feedbackText.text = "OK";
             //Debug.Log("S³abe trafienie");
             HealthPoints += 50;
+            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
+            GameEvents.OnHit?.Invoke(1);
             return 50;
         }
         else // nietrafienie
@@ -125,6 +131,8 @@ public class GameUIManager : MonoBehaviour
             feedbackText.text = "Nietrafione";
             //Debug.Log("Nietrafienie");
             HealthPoints = Mathf.Round(HealthPoints / 1000) * 1000;
+            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
+            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitAccuracy, 0);
             return 0;  
         }
 

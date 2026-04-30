@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -122.5, y: 29.236982}
-  m_SizeDelta: {x: 200, y: 41.526}
+  m_AnchoredPosition: {x: -0.000015259, y: 29.236982}
+  m_SizeDelta: {x: 445, y: 41.526}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6873643463956321971
 CanvasRenderer:
@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 6821058647126345841}
   - component: {fileID: 602480971233321806}
   - component: {fileID: 5103485925407613123}
+  - component: {fileID: 2860747952911138917}
   m_Layer: 5
   m_Name: Achievement Panel
   m_TagString: Untagged
@@ -234,6 +235,19 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2860747952911138917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4046485227008363523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05aff806edbc9f84eab4ed6fb0eddcb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  achdata: {fileID: 0}
 --- !u!1 &7486113761124920908
 GameObject:
   m_ObjectHideFlags: 0

@@ -89,7 +89,7 @@ public class MidiReader : MonoBehaviour
         result = result.OrderBy(n => n.StartTime).ToList();
         GameUIManager.instance.totalSongTime = result.Last().StartTime + result.Last().Length + 1500; //ustaw czas trwania piosenki na czas zakoñczenia ostatniej nuty
         GameManager.instance.longestNoteLength = (float)result.Max(n => n.Length); //ustaw d³ugoœæ najd³u¿szej nuty
-        Debug.Log("longest note" + GameManager.instance.longestNoteLength);
+        //Debug.Log("longest note" + GameManager.instance.longestNoteLength);
         return result;
     }
 

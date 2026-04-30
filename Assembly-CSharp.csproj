@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\AchievementData.cs" />
     <Compile Include="Assets\Scripts\KeyCollisionDetector.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleSaveFileText.cs" />
+    <Compile Include="Assets\Scripts\AchievementItemView.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserEditor.cs" />
     <Compile Include="Assets\Scripts\SelectSongItemData.cs" />
     <Compile Include="Assets\Scripts\SettingManager.cs" />
@@ -79,8 +80,10 @@
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleOpenFileText.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserMac.cs" />
     <Compile Include="Assets\Scripts\SongDatabase.cs" />
+    <Compile Include="Assets\Scripts\MainMenuUIMAnager.cs" />
     <Compile Include="Assets\Scripts\SceneRouter.cs" />
     <Compile Include="Assets\Scripts\AccountHandler.cs" />
+    <Compile Include="Assets\Scripts\PopulateAchievementsList.cs" />
     <Compile Include="Assets\Melanchall\DryWetMIDI\Demo\DemoScript.cs" />
     <Compile Include="Assets\InputSystem_Actions.cs" />
     <Compile Include="Assets\Scripts\GameUIManager.cs" />
@@ -116,7 +119,6 @@
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\Melanchall\DryWetMIDI\Melanchall_DryWetMidi_Native32.dll" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
-    <None Include="Assets\plan semestr letni.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\Melanchall\DryWetMIDI\Melanchall_DryWetMidi_Native64.dll" />

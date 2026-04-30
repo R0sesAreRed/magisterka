@@ -23,7 +23,8 @@ public class KeyboardManager : MonoBehaviour
     private Dictionary<GameManager.NK, float> lastCollisionTime = new(); //s³ownik przechowuj¹cy czas ostatniej kolizji dla ka¿dej nuty
     private Dictionary<GameManager.NK, float> lastKeyPressTime = new(); //s³ownik przechowuj¹cy czas ostatniego naciœniêcia klawisza dla ka¿dej nuty
 
-    private Dictionary<GameManager.NK, NoteTiming> noteTimings = new();
+    private Dictionary<GameManager.NK, Queue<NoteTiming>> noteTimings = new();
+
 
     public float ScreenHeight = 0;
     private void Awake()
@@ -49,7 +50,7 @@ public class KeyboardManager : MonoBehaviour
             KeysDict[(GameManager.NK)i].name = ((GameManager.NK)i).ToString();
             KeyColliders[(GameManager.NK)i] = Keys[i].GetComponentInChildren<BoxCollider2D>();
             KeyVisualsDict[(GameManager.NK)i] = Keys[i].transform.GetChild(0).gameObject;
-            Debug.Log(KeyVisualsDict[(GameManager.NK)i]);
+            //Debug.Log(KeyVisualsDict[(GameManager.NK)i]);
             var detector = Keys[i].GetComponent<KeyCollisionDetector>();
             if (detector != null)
             {
@@ -62,14 +63,17 @@ public class KeyboardManager : MonoBehaviour
 
     private void Start()
     {
-        foreach (var noteData in GameManager.instance.CurrMidiNotes) 
+        foreach (var noteData in GameManager.instance.CurrMidiNotes)
         {
-            noteTimings[noteData.Note] = new NoteTiming
+            if (!noteTimings.ContainsKey(noteData.Note))
+                noteTimings[noteData.Note] = new Queue<NoteTiming>();
+
+            noteTimings[noteData.Note].Enqueue(new NoteTiming
             {
-                noteStartTime = (noteData.StartTime / 1000.0) + 1.5f, // PRZY ZMIANIE TEMPA LOTU NUT TO TRZEBA ZMIENIÆ. NAJLEPIEJ W OGOLE TO ZROBIC ZALEZNE (3/4 * tempo spadania -> obecnie 2)
+                noteStartTime = (noteData.StartTime / 1000.0) + 1.5f,
                 noteLength = (noteData.Length / 1000.0)
-            };
-            Debug.Log($"Zarejestrowano nutê {noteData.Note} z czasem startu {noteTimings[noteData.Note].noteStartTime} i d³ugoœci¹ {noteTimings[noteData.Note].noteLength}");
+            });
+            //Debug.Log($"Zarejestrowano nutê {noteData.Note} z czasem startu {noteTimings[noteData.Note].noteStartTime} i d³ugoœci¹ {noteTimings[noteData.Note].noteLength}");
         }
     }
 
@@ -110,25 +114,29 @@ public class KeyboardManager : MonoBehaviour
         GameManager.instance.inputActions.Piano.Disable();
     }
 
-    
+
+    private Dictionary<GameManager.NK, NoteTiming> activeNoteTimings = new();
 
     private void OnKeyPerformed(GameManager.NK note, InputAction.CallbackContext ctx)
     {
         KeyPressColor(ctx, note);
 
-        double hitTime = GetCurrentSongTime(); // np. Time.time - songStartTime
-        if (noteTimings.TryGetValue(note, out var timing))
+        double hitTime = GetCurrentSongTime();
+        if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
         {
+            var timing = queue.Peek(); // nie usuwaj jeszcze z kolejki
             timing.hitTime = hitTime;
+            activeNoteTimings[note] = timing;
         }
     }
+
 
     private void OnKeyCanceled(GameManager.NK note, InputAction.CallbackContext ctx)
     {
         KeyReleaseColor(ctx, note);
 
         double releaseTime = GetCurrentSongTime();
-        if (noteTimings.TryGetValue(note, out var timing) && timing.hitTime.HasValue && !timing.scored)
+        if (activeNoteTimings.TryGetValue(note, out var timing) && timing.hitTime.HasValue && !timing.scored)
         {
             timing.releaseTime = releaseTime;
 
@@ -144,6 +152,12 @@ public class KeyboardManager : MonoBehaviour
             timing.scored = true;
             timing.hitTime = null;
             timing.releaseTime = null;
+
+            // Usuwamy z kolejki, bo ta nuta zosta³a ju¿ zagrana
+            if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
+                queue.Dequeue();
+
+            activeNoteTimings.Remove(note);
         }
     }
 
@@ -184,7 +198,7 @@ public class KeyboardManager : MonoBehaviour
             float delta = pressTime - time;
             if (delta >= -0.1f && delta <= 0.1f)
             {
-                GameUIManager.instance.Score += 10;
+                GameUIManager.instance.Score += 10; //??
                 lastKeyPressTime.Remove(note); //zapobiega podwójnym punktom
                 //Debug.Log($"Punkty (kolizja po naciœniêciu): {GameManager.instance.Score}");
             }
@@ -195,21 +209,27 @@ public class KeyboardManager : MonoBehaviour
     {
         if (lastCollisionTime.ContainsKey(note))
         {
-            if (noteTimings.TryGetValue(note, out var timing) && timing.hitTime == null && !timing.scored)
+            if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
             {
-                int score = GameUIManager.instance.CalculateScore(
-                    double.NaN,
-                    timing.noteStartTime,
-                    double.NaN,
-                    timing.noteLength,
-                    note
-                );
-                GameUIManager.instance.Score += score;
-                timing.scored = true;
-                GameUIManager.instance.HealthPoints -= 1000; //TESTOWAÆ JAK BEDZIE PIANINKO
-                Debug.Log($"MISS: Nuta {note} zosta³a ca³kowicie pominiêta, punkty: {score}");
-            }
+                var timing = queue.Peek();
+                if (timing.hitTime == null && !timing.scored)
+                {
+                    int score = GameUIManager.instance.CalculateScore(
+                        double.NaN,
+                        timing.noteStartTime,
+                        double.NaN,
+                        timing.noteLength,
+                        note
+                    );
+                    GameUIManager.instance.Score += score;
+                    timing.scored = true;
+                    GameUIManager.instance.HealthPoints -= 1000;
+                    Debug.Log($"MISS: Nuta {note} zosta³a ca³kowicie pominiêta, punkty: {score}");
 
+                    // Usuñ tê nutê z kolejki, bo zosta³a ju¿ rozliczona jako miss
+                    queue.Dequeue();
+                }
+            }
             lastCollisionTime.Remove(note);
         }
     }

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,13 +15,78 @@ public class GameManager : MonoBehaviour
     public float screenHeight = Screen.height;
     public bool IsPaused = false;
     public List<SelectSongItem> importedFiles = new List<SelectSongItem>();
+    public List<AchievementData> playerAchievements = new List<AchievementData>();
     [SerializeField] private SongSaveSystem saveSystem;
+    [SerializeField] private AudioMixer audiomixer;
     public SelectSongItem currentSong;
     public float longestNoteLength;
 
 
     public float songStartTime;
     public int nextNoteIndex; //te dwie nie wiem czy tu powinny byæ, na razie tu zostaj¹
+
+
+
+    public bool pointsOn;
+    public bool progressBarOn;
+    public bool hitQualityOn;
+    public bool achievementsOn;
+    public bool shopAndCurrencyOn;
+    public bool rewardsAndCosmeticOn;
+    public bool questsOn;
+    public bool leaderBoardOn;
+
+    private float Volume;
+
+    public float volume
+    {
+        get { return Volume; }
+        set
+        {
+            Volume = value;
+            audiomixer.SetFloat("vol", value == 0 ? -80 : Mathf.Log10(value) * 20);
+        }
+    }
+    public bool tutorialCompleted;
+
+    public string GetPersistSettingsName()
+    {
+        return SelectedAccount != null ? $"{SelectedAccount}_settings" : "default_settings";
+    }
+
+    public void ParseSettingsString(string settingsString)
+    {
+        pointsOn = settingsString[0] == '1';
+        progressBarOn = settingsString[1] == '1';
+        hitQualityOn = settingsString[2] == '1';
+        achievementsOn = settingsString[3] == '1';
+        shopAndCurrencyOn = settingsString[4] == '1';
+        rewardsAndCosmeticOn = settingsString[5] == '1';
+        questsOn = settingsString[6] == '1';
+        leaderBoardOn = settingsString[7] == '1';
+    }
+
+    [SerializeField] MainMenuUIMAnager MMUIM;
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        MMUIM = FindFirstObjectByType<MainMenuUIMAnager>();
+    }
+    public void loadSettings()
+    {
+        string settingsString = PlayerPrefs.GetString(GetPersistSettingsName(), "11111111");
+        ParseSettingsString(settingsString);
+        MMUIM.DisableButtons();
+    }
 
     //[SerializeField] TextMeshProUGUI scoreText;
 
@@ -52,11 +119,6 @@ public class GameManager : MonoBehaviour
         inputActions = new InputSystem_Actions();
         Object.DontDestroyOnLoad(gameObject);
     }
-
-
-
-    
-
     public class Notes
     {
         public NK Note;
