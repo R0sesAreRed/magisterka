@@ -14,14 +14,17 @@ public class FalingNotesSpawner : MonoBehaviour
 
     
     [HideInInspector] public float pauseTime;
-    
+
 
     private void Awake()
     {
         notesParent = this.transform;
-        GameManager.instance.songStartTime = Time.time;
-        GameManager.instance.nextNoteIndex = 0;
-        //Debug.Log("FalingNotesSpawner aktywowany: " + gameObject.name);
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.songStartTime = Time.time;
+            GameManager.instance.nextNoteIndex = 0;
+            Debug.Log("[FalingNotesSpawner] songStartTime set to " + GameManager.instance.songStartTime);
+        }
     }
 
     private IEnumerator Start() //UI zajmuje troche czasu u³ozenie sie po pocz¹tku sceny
@@ -46,14 +49,19 @@ public class FalingNotesSpawner : MonoBehaviour
 
     }
 
+    private Action<InputAction.CallbackContext> pauseResumeDelegate;
+
     private void OnEnable()
     {
-        GameManager.instance.inputActions.Piano.PauseResume.performed += ctx => PauseResume(ctx);
+        if (pauseResumeDelegate == null)
+            pauseResumeDelegate = ctx => PauseResume(ctx);
+        GameManager.instance.inputActions.Piano.PauseResume.performed += pauseResumeDelegate;
     }
 
     private void OnDisable()
     {
-        GameManager.instance.inputActions.Piano.PauseResume.performed -= ctx => PauseResume(ctx);
+        if (pauseResumeDelegate != null)
+            GameManager.instance.inputActions.Piano.PauseResume.performed -= pauseResumeDelegate;
     }
 
 
@@ -129,18 +137,43 @@ public class FalingNotesSpawner : MonoBehaviour
 
     public void PauseResume(InputAction.CallbackContext ctx)
     {
+        Debug.Log("[FalingNotesSpawner] PauseResume called. IsPaused before: " + GameManager.instance.IsPaused);
         if (GameManager.instance.IsPaused)
         {
             float pausedDuration = Time.time - pauseTime;
             GameManager.instance.songStartTime += pausedDuration;
             GameManager.instance.IsPaused = false;
-            Debug.Log("unPaused");
+            Debug.Log("[FalingNotesSpawner] Unpausing. Calling TurnOffPauseMenu().");
+            GameUIManager.instance.TurnOffPauseMenu();
+            Debug.Log("[FalingNotesSpawner] UnPaused. IsPaused after: " + GameManager.instance.IsPaused);
         }
         else
         {
             pauseTime = Time.time;
             GameManager.instance.IsPaused = true;
-            Debug.Log("Paused");
+            Debug.Log("[FalingNotesSpawner] Pausing. Calling TurnOnPauseMenu().");
+            GameUIManager.instance.TurnOnPauseMenu();
+            Debug.Log("[FalingNotesSpawner] Paused. IsPaused after: " + GameManager.instance.IsPaused);
         }
+    }
+
+    public void PauseEndLevel()
+    {
+        pauseTime = Time.time;
+        GameManager.instance.IsPaused = true;
+        //Debug.Log("Paused");
+    }
+
+    public void Resume()
+    {
+        float pausedDuration = Time.time - pauseTime;
+        GameManager.instance.songStartTime += pausedDuration;
+        GameManager.instance.IsPaused = false;
+        GameUIManager.instance.TurnOffPauseMenu();
+        //Debug.Log("unPaused");
+    }
+    public void Upause()
+    {
+        GameManager.instance.IsPaused = false;
     }
 }

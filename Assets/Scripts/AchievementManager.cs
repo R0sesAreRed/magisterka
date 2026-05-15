@@ -5,9 +5,10 @@ using UnityEngine;
 
 public class AchievementManager : MonoBehaviour
 {
+    [SerializeField] private AcheivementGameplayDisplay AGD;
     private void Awake()
     {
-        //UnityEngine.Object.DontDestroyOnLoad(gameObject);
+        UnityEngine.Object.DontDestroyOnLoad(gameObject);
     }
 
     private string GetPath()
@@ -15,7 +16,7 @@ public class AchievementManager : MonoBehaviour
         if (GameManager.instance.SelectedAccount != null)
             return Path.Combine(Application.persistentDataPath, $"{GameManager.instance.SelectedAccount}_achievements.json");
         else
-            return Path.Combine(Application.persistentDataPath, "default_songs.json");
+            return Path.Combine(Application.persistentDataPath, "default_achievements.json");
     }
 
     public void Save(List<AchievementData> items) //to trzeba dodaæ w miejscach ktore tego potrzebuja
@@ -24,13 +25,13 @@ public class AchievementManager : MonoBehaviour
 
         foreach (var item in items)
         {
-            db.songs.Add(new AchievementData(item));
+            db.achv.Add(new AchievementDataClass(item));
         }
 
         string json = JsonUtility.ToJson(db, true);
         File.WriteAllText(GetPath(), json);
 
-        Debug.Log("Saved achievements to: " + GetPath());
+        //Debug.Log("Saved achievements to: " + GetPath());
     }
 
     public List<AchievementData> Load()
@@ -46,7 +47,7 @@ public class AchievementManager : MonoBehaviour
 
         List<AchievementData> result = new List<AchievementData>();
 
-        foreach (var data in db.songs)
+        foreach (var data in db.achv)
         {
             result.Add(data.ToScriptableObject());
         }
@@ -128,13 +129,16 @@ public class AchievementManager : MonoBehaviour
             if (ach.rest == type && !ach.completed)
             {
                 ach.currentValue += value;
+                //Debug.Log($"Updated achievement '{ach.title}' progress: {ach.currentValue}/{ach.targetValue}");
                 if (ach.currentValue >= ach.targetValue)
                 {
-                    ach.completed = true;
-                    OnAchievementCompleted(ach);
+                    ach.completed = true; //raz
+                    AGD.DisplayAchievement(ach);
+                    //OnAchievementCompleted(ach);
                 }
             }
         }
+        Save(GameManager.instance.playerAchievements); //temporary tutej
     }
 
     private void SetAchievementValue(AchievementRestriction type, int value)
@@ -147,15 +151,17 @@ public class AchievementManager : MonoBehaviour
                 if (ach.currentValue >= ach.targetValue)
                 {
                     ach.completed = true;
-                    OnAchievementCompleted(ach);
+                    AGD.DisplayAchievement(ach);
+                    //OnAchievementCompleted(ach);
                 }
             }
         }
+        Save(GameManager.instance.playerAchievements); //temporary tutej
     }
 
     private void OnAchievementCompleted(AchievementData ach)
     {
-        ach.completed = true;
+        ach.completed = true; //dwa??
         Debug.Log($"Achievement unlocked: {ach.title}");
         Save(GameManager.instance.playerAchievements);
     }
@@ -181,15 +187,15 @@ public static class GameEvents
 // przejœcie poziomów 1, 3, 5, 10, 20, wszystkie -> levels
 
 // + perfect hit                                  -> hit quality
-// ci¹g trafieñ 10, 50, 100, 200                -> hit accuracy
+// + ci¹g trafieñ 10, 50, 100, 200                -> hit accuracy
 // + ci¹g perfect hitów 5, 10, 25, 50             -> hit quality
-// odzyskane hp                                 -> regained hp
+// + odzyskane hp                                 -> regained hp
 // complete level:                              
-// perfect hity 100%, 75%, 50%                  -> level quality
-// bez straty hp                                -> level health quality
+// + perfect hity 100%, 75%, 50%                  -> level quality
+// + bez straty hp                                -> level health quality
 
 //kupowanie itemów:                             -> shop
-//kupienie pierwaszego itemu
+//+ kupienie pierwaszego itemu
 //kupienie ca³ego zestawu itemów
 //wykupienie sklepu
 
@@ -198,7 +204,7 @@ public static class GameEvents
 
 public class AcheivementsDatabase
 {
-    public List<AchievementData> songs = new List<AchievementData>();
+    public List<AchievementDataClass> achv = new List<AchievementDataClass>();
 }
 
 

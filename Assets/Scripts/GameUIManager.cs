@@ -1,5 +1,6 @@
 using Melanchall.DryWetMidi.Interaction;
 using System;
+using System.Net;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -15,8 +16,11 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI feedbackText;
 
     [SerializeField] GameObject[] hearths;
-    private float healthPoints = 3000;
 
+    public GameObject GameEndMenu;
+    public GameObject GamePausedMenu;
+    private float healthPoints = 3000;
+    public FalingNotesSpawner FNS;
     public float HealthPoints
     {
         get { return healthPoints; }
@@ -27,11 +31,11 @@ public class GameUIManager : MonoBehaviour
                 return;
 
             healthPoints = clamped;
-            Debug.Log("healthPoints: " + healthPoints);
+            //Debug.Log("healthPoints: " + healthPoints);
             for (int i = 0; i < hearths.Length; i++)
             {
                 float hearthValue = Mathf.Clamp(healthPoints - i * 1000, 0, 1000) / 1000f;
-                Debug.Log("hearthValue: " + hearthValue);
+                //Debug.Log("hearthValue: " + hearthValue);
                 Transform mask = hearths[i].transform.Find("HearthMask");
                 if (mask != null)
                 {
@@ -45,10 +49,15 @@ public class GameUIManager : MonoBehaviour
                     outline.gameObject.SetActive(hearthValue >= 1f);
                 }
             }
+            if(value <= 0)
+            {
+                FNS.PauseEndLevel();
+                OnLevelEnd();
+            }
         }
     }
 
-    public double totalSongTime;
+    public double totalSongTime = 0;
     public double songTimePlayed = 0;
     private int score = 0; //punkty zdobywane w czasie gry
     private double displayScore = 0; //punkty wyœwietlane na ekranie
@@ -62,12 +71,11 @@ public class GameUIManager : MonoBehaviour
     }
     private void Awake()
     {
-        if (instance == null && instance != this)
+        if (instance == null)
         {
             instance = this;
-            //DontDestroyOnLoad(gameObject);
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
         }
@@ -82,14 +90,20 @@ public class GameUIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(displayScore < score)
+        if (displayScore < score)
         {
-            displayScore += 0.1f; //p³ynne zwiêkszanie wyœwietlanego wyniku
+            displayScore += 0.1f;
             scoreText.text = "Score: " + ((int)displayScore).ToString();
         }
-        if(!GameManager.instance.IsPaused)
+        if (!GameManager.instance.IsPaused)
         {
-            progressBar.fillAmount = (float)(songTimePlayed / totalSongTime); //aktualizacja paska postêpu
+            progressBar.fillAmount = (float)(songTimePlayed / totalSongTime);
+            Debug.Log("[GameUIManager] ProgressBar fill: " + progressBar.fillAmount + " songTimePlayed: " + songTimePlayed + " totalSongTime: " + totalSongTime);
+        }
+        if (songTimePlayed >= totalSongTime + 1500 && !GameEndMenu.activeSelf)
+        {
+            Debug.Log("[GameUIManager] OnLevelEnd called from Update");
+            OnLevelEnd();
         }
     }
 
@@ -129,12 +143,45 @@ public class GameUIManager : MonoBehaviour
         else // nietrafienie
         {
             feedbackText.text = "Nietrafione";
-            //Debug.Log("Nietrafienie");
-            HealthPoints = Mathf.Round(HealthPoints / 1000) * 1000;
+            Debug.Log("Losing hp from " + HealthPoints);
+            HealthPoints = Mathf.Round((HealthPoints) / 1000) * 1000;
+            Debug.Log("New hp: " + HealthPoints);
             GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
             GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitAccuracy, 0);
             return 0;  
         }
+        
+    }
 
+    public void OnLevelEnd()
+    {
+        GameEndMenu.SetActive(true);
+
+        //achievements, questy i reset czego trzeba
+    }
+    public void TurnOffEndMenu()
+    {
+        GameEndMenu.SetActive(false);
+    }
+    public void TurnOnPauseMenu()
+    {
+        Debug.Log("[GameUIManager] TurnOnPauseMenu called. GamePausedMenu: " + (GamePausedMenu != null));
+        if (GamePausedMenu != null)
+            GamePausedMenu.SetActive(true);
+        else
+            Debug.LogWarning("[GameUIManager] GamePausedMenu is null!");
+    }
+
+    public void TurnOffPauseMenu()
+    {
+        Debug.Log("[GameUIManager] TurnOffPauseMenu called. GamePausedMenu: " + (GamePausedMenu != null));
+        if (GamePausedMenu != null)
+            GamePausedMenu.SetActive(false);
+        else
+            Debug.LogWarning("[GameUIManager] GamePausedMenu is null!");
     }
 }
+
+//co jest potrzebne ¿eby zresetowaæ poziom:
+//totalSongTime
+//songTimePlayed

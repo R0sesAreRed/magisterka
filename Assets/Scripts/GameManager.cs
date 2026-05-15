@@ -13,9 +13,15 @@ public class GameManager : MonoBehaviour
     public InputSystem_Actions inputActions;
 
     public float screenHeight = Screen.height;
+
     public bool IsPaused = false;
+
     public List<SelectSongItem> importedFiles = new List<SelectSongItem>();
     public List<AchievementData> playerAchievements = new List<AchievementData>();
+    public List<QuestData> playerCurrentQuests = new List<QuestData>();
+    public List<CosmeticsData> allCosmetics = new List<CosmeticsData>();
+    public List<CosmeticsData> playerCosmetics = new List<CosmeticsData>();
+    public List<CosmeticsData> playerEquippedCosmetics = new List<CosmeticsData>();
     [SerializeField] private SongSaveSystem saveSystem;
     [SerializeField] private AudioMixer audiomixer;
     public SelectSongItem currentSong;
@@ -48,6 +54,7 @@ public class GameManager : MonoBehaviour
         }
     }
     public bool tutorialCompleted;
+    public int currency = 0;
 
     public string GetPersistSettingsName()
     {

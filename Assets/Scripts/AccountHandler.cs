@@ -60,8 +60,12 @@ public class AccountHandler : MonoBehaviour
         GameManager.instance.SelectedAccount = acc.AccountName;
         GameManager.instance.volume = acc.Volume;
         GameManager.instance.tutorialCompleted = acc.TutorialCompleted;
+        GameManager.instance.currency = acc.currency;
         GameManager.instance.loadSettings();
         GameEvents.LoadAchievements.Invoke();
+        QuestEvents.LoadQuests.Invoke();
+        CosmeticsEvents.LoadCosmetics.Invoke();
+        CosmeticsEvents.LoadEquipped.Invoke(); //wczytywanie cosmetików
 
         gameObject.SetActive(false);
     }
@@ -77,6 +81,7 @@ public static class AccountUtility
         public string AccountName;
         public float Volume;
         public bool TutorialCompleted = false;
+        public int currency = 0;
     }
 
     [System.Serializable]
@@ -131,6 +136,22 @@ public static class AccountUtility
                 acc.TutorialCompleted = newTutorialCompleted;
                 SaveAccounts(accounts);
                 Debug.Log($"Account '{GameManager.instance.SelectedAccount}' tutorialCompleted updated: {newTutorialCompleted}");
+                return;
+            }
+        }
+        Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
+    }
+
+    public static void UpdateAccountCurrency(int newCurrency)
+    {
+        var accounts = LoadAccounts();
+        foreach (var acc in accounts)
+        {
+            if (acc.AccountName == GameManager.instance.SelectedAccount)
+            {
+                acc.currency = newCurrency;
+                SaveAccounts(accounts);
+                Debug.Log($"Account '{GameManager.instance.SelectedAccount}' currency updated: {newCurrency}");
                 return;
             }
         }

@@ -13,32 +13,37 @@
 	poziomy
 +	punkty
 +	natychmiastowy feedback (ok, good, perfect, życia)
-	cyfrowa waluta
-	Zadania
-	achievementy (badge)
-	skinki
+50/50	cyfrowa waluta
+50/50	Zadania
+50/50	achievementy (badge)
+25/75	skinki
 +	paski progresu
 	leaderboard
 -ui:
 	wybieranie trybu gry 
-	osiągnięcia
+50/50	osiągnięcia
 +	ustawienia 
 	tablica wyników
 -dodatki do gameplayu:
 +	natychmistowy feedback
 	skiny
-	wyświetlanie powiadomień o osiągnięciach i zadaniach
+50/50	wyświetlanie powiadomień o osiągnięciach i zadaniach
 		
 
-23.04:
-pierwsze działające osiągnięcie
-zapisywanie osiągnięć do użytkownika
-rozwinąć konta o: tutorial completed...
+menu questów i logika questów
 
-24.04:
-menu pauzy
-natłuc osiągnięć
 menu sklepu
+gameUIManager -> funkcjonalność cosmeticow
+
+dodać progresje poziomów do ustawień
+progresja poziomów
+
+
+
+podpięcie bazy danych
+leaderboard (wygląd + działanie)
+zbieranie danych
+>na podstawie zebranych danych progresuj questy
 
 
 
