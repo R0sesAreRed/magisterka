@@ -61,6 +61,7 @@ public class AccountHandler : MonoBehaviour
         GameManager.instance.volume = acc.Volume;
         GameManager.instance.tutorialCompleted = acc.TutorialCompleted;
         GameManager.instance.currency = acc.currency;
+        DataCollection.instance.TotalTimePlayed = acc.TotalTimePlayed;
         GameManager.instance.loadSettings();
         GameEvents.LoadAchievements.Invoke();
         QuestEvents.LoadQuests.Invoke();
@@ -82,6 +83,7 @@ public static class AccountUtility
         public float Volume;
         public bool TutorialCompleted = false;
         public int currency = 0;
+        public double TotalTimePlayed = 0;
     }
 
     [System.Serializable]
@@ -142,7 +144,7 @@ public static class AccountUtility
         Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
     }
 
-    public static void UpdateAccountCurrency(int newCurrency)
+    public static void UpdateAccountCurrency(int newCurrency) //<--- pamietac o tym
     {
         var accounts = LoadAccounts();
         foreach (var acc in accounts)
@@ -152,6 +154,22 @@ public static class AccountUtility
                 acc.currency = newCurrency;
                 SaveAccounts(accounts);
                 Debug.Log($"Account '{GameManager.instance.SelectedAccount}' currency updated: {newCurrency}");
+                return;
+            }
+        }
+        Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
+    }
+
+    public static void UpdateAccountTimePlayed(double TimePlayed) //<--- pamietac o tym
+    {
+        var accounts = LoadAccounts();
+        foreach (var acc in accounts)
+        {
+            if (acc.AccountName == GameManager.instance.SelectedAccount)
+            {
+                acc.TotalTimePlayed += TimePlayed;
+                SaveAccounts(accounts);
+                Debug.Log($"Account '{GameManager.instance.SelectedAccount}' total time played updated: {acc.TotalTimePlayed}");
                 return;
             }
         }

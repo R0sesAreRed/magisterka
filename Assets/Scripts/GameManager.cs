@@ -33,13 +33,13 @@ public class GameManager : MonoBehaviour
 
 
 
-    public bool pointsOn;
-    public bool progressBarOn;
-    public bool hitQualityOn;
-    public bool achievementsOn;
-    public bool shopAndCurrencyOn;
-    public bool rewardsAndCosmeticOn;
-    public bool questsOn;
+    public bool pointsOn; //+
+    public bool progressBarOn; //+
+    public bool hitQualityOn; //+
+    public bool achievementsOn; //+
+    public bool shopAndCurrencyOn; //+
+    public bool rewardsAndCosmeticOn; //+
+    public bool questsOn; //+
     public bool leaderBoardOn;
 
     private float Volume;
@@ -53,7 +53,7 @@ public class GameManager : MonoBehaviour
             audiomixer.SetFloat("vol", value == 0 ? -80 : Mathf.Log10(value) * 20);
         }
     }
-    public bool tutorialCompleted;
+    public bool tutorialCompleted = false;
     public int currency = 0;
 
     public string GetPersistSettingsName()

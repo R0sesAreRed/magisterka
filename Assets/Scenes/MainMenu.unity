@@ -3621,7 +3621,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1374956624}
   m_Direction: 2
   m_Value: 1.0000066
-  m_Size: 0.8386701
+  m_Size: 0.83866996
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3676,6 +3676,9 @@ GameObject:
   - component: {fileID: 1909634709}
   - component: {fileID: 1909634711}
   - component: {fileID: 1909634712}
+  - component: {fileID: 1909634713}
+  - component: {fileID: 1909634714}
+  - component: {fileID: 1909634715}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3711,6 +3714,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 62c4af1b105c6f643a6d9ceb286c8cd1, type: 2}
   - {fileID: 11400000, guid: 6efad95c2c894b143885436bee920355, type: 2}
   - {fileID: 11400000, guid: d75065715d6342043aa0a6a3cfa310ab, type: 2}
+  - {fileID: 11400000, guid: 715f4591416784c47a36a18540668bb6, type: 2}
   - {fileID: 11400000, guid: d38e200bd68581240a38deb05441b590, type: 2}
   - {fileID: 11400000, guid: 117b273ef50f5f54caa721c9624787a7, type: 2}
   - {fileID: 11400000, guid: 6c703d46e42fc3845b50ce5d6dcc70a3, type: 2}
@@ -3721,6 +3725,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0ebf1375d3b1c1a438f5a01411557a8d, type: 2}
   - {fileID: 11400000, guid: bace629f4b948d44681b53f8d03ad37c, type: 2}
   playerCurrentQuests: []
+  allCosmetics: []
+  playerCosmetics: []
+  playerEquippedCosmetics: []
   audiomixer: {fileID: 24100000, guid: c494c11422d90c744ba773653642ed34, type: 2}
   currentSong: {fileID: 11400000, guid: 51a97e6fba5aed34b97b6976ffe26b4f, type: 2}
   longestNoteLength: 0
@@ -3735,6 +3742,7 @@ MonoBehaviour:
   questsOn: 0
   leaderBoardOn: 0
   tutorialCompleted: 0
+  currency: 0
   MMUIM: {fileID: 314836961}
 --- !u!4 &1909634710
 Transform:
@@ -3777,6 +3785,51 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AchievementDisplayPrefab: {fileID: 4046485227008363523, guid: 42e647bd50148c24e9388d301797072f, type: 3}
+--- !u!114 &1909634713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909634708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99edd67b059794c45b54c583638a2dc9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  TotalNotes: 0
+  MissedNotes: 0
+  OkNotes: 0
+  GoodNotes: 0
+  PerfectNotes: 0
+  TotalTimePlayed: 0
+  LevelSuccess: 0
+--- !u!114 &1909634714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909634708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f69ba546a58b3b14180bed7cda0606c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allQuests: []
+--- !u!114 &1909634715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1909634708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae8ad016fa5e1df4aa3cad22d0a325c4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AllCosmetics: []
 --- !u!1 &1919532339
 GameObject:
   m_ObjectHideFlags: 0

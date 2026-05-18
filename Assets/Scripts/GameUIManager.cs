@@ -1,5 +1,6 @@
 using Melanchall.DryWetMidi.Interaction;
 using System;
+using System.Linq;
 using System.Net;
 using TMPro;
 using UnityEngine;
@@ -21,6 +22,15 @@ public class GameUIManager : MonoBehaviour
     public GameObject GamePausedMenu;
     private float healthPoints = 3000;
     public FalingNotesSpawner FNS;
+
+    public GameObject ScoreText;
+    public GameObject ProgressBar;
+    public GameObject Feedback;
+
+    public GameObject Background;
+    bool LevelComplete = false;
+
+
     public float HealthPoints
     {
         get { return healthPoints; }
@@ -29,8 +39,11 @@ public class GameUIManager : MonoBehaviour
             float clamped = Mathf.Clamp(value, 0, 3000);
             if (Mathf.Approximately(healthPoints, clamped))
                 return;
-
-            healthPoints = clamped;
+            if ((healthPoints < 1000 && clamped > 1000) || (healthPoints < 2000 && clamped > 2000) || (healthPoints < 3000 && clamped >= 3000))
+            {
+                GameEvents.OnRegainedHp.Invoke(1);
+            }
+                healthPoints = clamped;
             //Debug.Log("healthPoints: " + healthPoints);
             for (int i = 0; i < hearths.Length; i++)
             {
@@ -49,10 +62,11 @@ public class GameUIManager : MonoBehaviour
                     outline.gameObject.SetActive(hearthValue >= 1f);
                 }
             }
+            
             if(value <= 0)
             {
                 FNS.PauseEndLevel();
-                OnLevelEnd();
+                OnLevelLose();
             }
         }
     }
@@ -79,6 +93,33 @@ public class GameUIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        if(!GameManager.instance.pointsOn)
+        {
+            ScoreText.SetActive(false);
+        }
+        if(!GameManager.instance.progressBarOn)
+        {
+            ProgressBar.SetActive(false);
+        }
+        if(!GameManager.instance.hitQualityOn)
+        {
+            Feedback.SetActive(false);
+        }
+        if(!GameManager.instance.rewardsAndCosmeticOn)
+        {
+            var fontcosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font);
+            if(fontcosmetic!= null && ScoreText.activeSelf)
+            {
+                ScoreText.GetComponent<TMP_Text>().font = fontcosmetic.font;
+            }
+            var backgroundCosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Background);
+            if(backgroundCosmetic!= null && Background.activeSelf)
+            {
+                Background.GetComponent<Image>().sprite = backgroundCosmetic.sprite;
+                Background.GetComponent<Image>().color = backgroundCosmetic.colorWhite;
+            }
+        }
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -92,18 +133,19 @@ public class GameUIManager : MonoBehaviour
     {
         if (displayScore < score)
         {
-            displayScore += 0.1f;
+            displayScore += 1f; //0.1f
             scoreText.text = "Score: " + ((int)displayScore).ToString();
         }
         if (!GameManager.instance.IsPaused)
         {
             progressBar.fillAmount = (float)(songTimePlayed / totalSongTime);
-            Debug.Log("[GameUIManager] ProgressBar fill: " + progressBar.fillAmount + " songTimePlayed: " + songTimePlayed + " totalSongTime: " + totalSongTime);
+            //Debug.Log("[GameUIManager] ProgressBar fill: " + progressBar.fillAmount + " songTimePlayed: " + songTimePlayed + " totalSongTime: " + totalSongTime);
         }
-        if (songTimePlayed >= totalSongTime + 1500 && !GameEndMenu.activeSelf)
+        if (songTimePlayed >= totalSongTime + 1500 && !LevelComplete)
         {
+            LevelComplete = true;
             Debug.Log("[GameUIManager] OnLevelEnd called from Update");
-            OnLevelEnd();
+            OnLevelComlete();
         }
     }
 
@@ -113,31 +155,34 @@ public class GameUIManager : MonoBehaviour
         double timeDifference = Mathf.Abs((float)(hitTime - noteStartTime));
         double releaseDifference = Mathf.Abs((float)(releaseTime - (noteStartTime + noteLength)));
         Debug.Log($"Nuta {note} ró¿nica czasu: {timeDifference}, ró¿nica release: {releaseDifference}");
-        if (timeDifference+releaseDifference <= 0.15f) // idealne trafienie
+        if (timeDifference+releaseDifference <= 0.3f) // idealne trafienie 15
         {
             //Debug.Log("Perfekcyje trafienie");
             feedbackText.text = "Perfekcyjnie!";
             HealthPoints += 100;
             GameEvents.OnPerfectHit?.Invoke(1);
             GameEvents.OnHit?.Invoke(1);
+            DataCollection.instance.PerfectNotes++;
             return 100;
         }
-        else if (timeDifference+releaseDifference <= 0.3f) // dobre trafienie
+        else if (timeDifference+releaseDifference <= 0.45f) // dobre trafienie 30
         {
             //Debug.Log("Dobre trafienie");
             feedbackText.text = "Dobrze!";
             HealthPoints += 70;
             GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
             GameEvents.OnHit?.Invoke(1);
+            DataCollection.instance.GoodNotes++;
             return 70;
         }
-        else if (timeDifference + releaseDifference <= 0.45f) // s³abe trafienie
+        else if (timeDifference + releaseDifference <= 0.7f) // s³abe trafienie 45
         {
             feedbackText.text = "OK";
             //Debug.Log("S³abe trafienie");
             HealthPoints += 50;
             GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
             GameEvents.OnHit?.Invoke(1);
+            DataCollection.instance.OkNotes++;
             return 50;
         }
         else // nietrafienie
@@ -148,16 +193,27 @@ public class GameUIManager : MonoBehaviour
             Debug.Log("New hp: " + HealthPoints);
             GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
             GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitAccuracy, 0);
+            DataCollection.instance.MissedNotes++;
             return 0;  
         }
         
     }
 
-    public void OnLevelEnd()
+    public void OnLevelComlete()
     {
         GameEndMenu.SetActive(true);
-
-        //achievements, questy i reset czego trzeba
+        GameEvents.OnCompleteLevel.Invoke(1);
+        DataCollection.instance.LevelSuccess = true;
+        DataCollection.instance.TotalTimePlayed += totalSongTime;
+        AccountUtility.UpdateAccountTimePlayed(totalSongTime);
+        //achievements, questy
+        DataCollection.instance.SubmitData();        
+    }
+    public void OnLevelLose()
+    {
+        DataCollection.instance.TotalTimePlayed += songTimePlayed;
+        GameEndMenu.SetActive(true);
+        DataCollection.instance.SubmitData();
     }
     public void TurnOffEndMenu()
     {

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "CosmeticsData", menuName = "Scriptable Objects/CosmeticsData")]
@@ -8,7 +9,7 @@ public class CosmeticsData : ScriptableObject
     public CosmeticType type;
     public int CurrencyCost;
     public int SetNumber;
-    public Font? font;
+    public TMP_FontAsset? font;
     public Sprite? sprite;
     public Color colorWhite;
     public Color colorBlack;

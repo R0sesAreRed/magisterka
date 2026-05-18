@@ -32,7 +32,6 @@
 
 menu questów i logika questów
 
-menu sklepu
 gameUIManager -> funkcjonalność cosmeticow
 
 dodać progresje poziomów do ustawień

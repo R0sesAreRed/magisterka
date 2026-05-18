@@ -124,39 +124,45 @@ public class AchievementManager : MonoBehaviour
 
     private void GrantAchievementProgress(AchievementRestriction type, int value)
     {
-        foreach (var ach in GameManager.instance.playerAchievements)
+        if(GameManager.instance.achievementsOn)
         {
-            if (ach.rest == type && !ach.completed)
+            foreach (var ach in GameManager.instance.playerAchievements)
             {
-                ach.currentValue += value;
-                //Debug.Log($"Updated achievement '{ach.title}' progress: {ach.currentValue}/{ach.targetValue}");
-                if (ach.currentValue >= ach.targetValue)
+                if (ach.rest == type && !ach.completed)
                 {
-                    ach.completed = true; //raz
-                    AGD.DisplayAchievement(ach);
-                    //OnAchievementCompleted(ach);
+                    ach.currentValue += value;
+                    //Debug.Log($"Updated achievement '{ach.title}' progress: {ach.currentValue}/{ach.targetValue}");
+                    if (ach.currentValue >= ach.targetValue)
+                    {
+                        ach.completed = true; //raz
+                        AGD.DisplayAchievement(ach);
+                        //OnAchievementCompleted(ach);
+                    }
                 }
             }
+            Save(GameManager.instance.playerAchievements); //temporary tutej
         }
-        Save(GameManager.instance.playerAchievements); //temporary tutej
     }
 
     private void SetAchievementValue(AchievementRestriction type, int value)
     {
-        foreach (var ach in GameManager.instance.playerAchievements)
+        if (GameManager.instance.achievementsOn)
         {
-            if (ach.rest == type && !ach.completed)
+            foreach (var ach in GameManager.instance.playerAchievements)
             {
-                ach.currentValue = value;
-                if (ach.currentValue >= ach.targetValue)
+                if (ach.rest == type && !ach.completed)
                 {
-                    ach.completed = true;
-                    AGD.DisplayAchievement(ach);
-                    //OnAchievementCompleted(ach);
+                    ach.currentValue = value;
+                    if (ach.currentValue >= ach.targetValue)
+                    {
+                        ach.completed = true;
+                        AGD.DisplayAchievement(ach);
+                        //OnAchievementCompleted(ach);
+                    }
                 }
             }
-        }
-        Save(GameManager.instance.playerAchievements); //temporary tutej
+            Save(GameManager.instance.playerAchievements); //temporary tutej
+        }   
     }
 
     private void OnAchievementCompleted(AchievementData ach)
@@ -170,10 +176,10 @@ public class AchievementManager : MonoBehaviour
 
 public static class GameEvents
 {
-    public static Action<int> OnCompleteLevel;
-    public static Action<int> OnPerfectHit;
-    public static Action<int> OnHit;
-    public static Action<int> OnRegainedHp;
+    public static Action<int> OnCompleteLevel; //+
+    public static Action<int> OnPerfectHit; //+
+    public static Action<int> OnHit; //+
+    public static Action<int> OnRegainedHp; //+
     public static Action<int> OnCompleteLevelQuality;
     public static Action<int> OnCompleteLevelHealthQuality;
     public static Action<int> OnPurchaseItem;

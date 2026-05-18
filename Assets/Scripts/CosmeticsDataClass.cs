@@ -1,4 +1,5 @@
 using Melanchall.DryWetMidi.Interaction;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 [System.Serializable]
@@ -9,7 +10,7 @@ public class CosmeticsDataClass
     public CosmeticType type;
     public int CurrencyCost;
     public int SetNumber;
-    public Font? font;
+    public TMP_FontAsset? font;
     public Sprite? sprite;
     public Color colorWhite;
     public Color colorBlack;

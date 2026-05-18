@@ -93,7 +93,10 @@ public class QuestManager : MonoBehaviour
 
     public void progressQuest()
     {
+        if(GameManager.instance.questsOn)
+        {
 
+        }
     }
 
     public void onQuestComplete(QuestData compquest)
