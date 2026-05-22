@@ -29,10 +29,11 @@ public class GameManager : MonoBehaviour
 
 
     public float songStartTime;
-    public int nextNoteIndex; //te dwie nie wiem czy tu powinny byæ, na razie tu zostaj¹
+    public int nextNoteIndex; //te dwie nie wiem czy tu powinny byï¿½, na razie tu zostajï¿½
 
+    public int completedQuests = 0;
 
-
+    public bool levelsOn;
     public bool pointsOn; //+
     public bool progressBarOn; //+
     public bool hitQualityOn; //+
@@ -63,6 +64,7 @@ public class GameManager : MonoBehaviour
 
     public void ParseSettingsString(string settingsString)
     {
+        Debug.Log(settingsString);
         pointsOn = settingsString[0] == '1';
         progressBarOn = settingsString[1] == '1';
         hitQualityOn = settingsString[2] == '1';
@@ -71,6 +73,7 @@ public class GameManager : MonoBehaviour
         rewardsAndCosmeticOn = settingsString[5] == '1';
         questsOn = settingsString[6] == '1';
         leaderBoardOn = settingsString[7] == '1';
+        levelsOn = settingsString[8] == '1';
     }
 
     [SerializeField] MainMenuUIMAnager MMUIM;
@@ -90,7 +93,7 @@ public class GameManager : MonoBehaviour
     }
     public void loadSettings()
     {
-        string settingsString = PlayerPrefs.GetString(GetPersistSettingsName(), "11111111");
+        string settingsString = PlayerPrefs.GetString(GetPersistSettingsName(), "111111111");
         ParseSettingsString(settingsString);
         MMUIM.DisableButtons();
     }

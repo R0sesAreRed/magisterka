@@ -5,16 +5,16 @@ public class SelectSongItemData
 {
     public string Title;
     public string FilePath;
-    public int HighScore;
-    public int MaxScore;
+    public double BestScore;
+    public int Level;
     public bool added;
 
     public SelectSongItemData(SelectSongItem item)
     {
         Title = item.Title;
         FilePath = item.FilePath;
-        HighScore = item.HighScore;
-        MaxScore = item.MaxScore;
+        BestScore = item.BestScore;
+        Level = item.Level;
         added = item.added;
     }
 
@@ -23,8 +23,8 @@ public class SelectSongItemData
         var item = ScriptableObject.CreateInstance<SelectSongItem>();
         item.Title = Title;
         item.FilePath = FilePath;
-        item.HighScore = HighScore;
-        item.MaxScore = MaxScore;
+        item.BestScore = BestScore;
+        item.Level = Level;
         item.added = added;
         return item;
     }

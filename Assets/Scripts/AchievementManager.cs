@@ -167,7 +167,8 @@ public class AchievementManager : MonoBehaviour
 
     private void OnAchievementCompleted(AchievementData ach)
     {
-        ach.completed = true; //dwa??
+        ach.completed = true;
+        QuestEvents.ProgressQuest.Invoke(QuestRestriction.Achievement, 1);
         Debug.Log($"Achievement unlocked: {ach.title}");
         Save(GameManager.instance.playerAchievements);
     }
@@ -180,10 +181,10 @@ public static class GameEvents
     public static Action<int> OnPerfectHit; //+
     public static Action<int> OnHit; //+
     public static Action<int> OnRegainedHp; //+
-    public static Action<int> OnCompleteLevelQuality;
-    public static Action<int> OnCompleteLevelHealthQuality;
+    public static Action<int> OnCompleteLevelQuality; //+
+    public static Action<int> OnCompleteLevelHealthQuality; //+
     public static Action<int> OnPurchaseItem;
-    public static Action<int> OnCompleteQuest;
+    public static Action<int> OnCompleteQuest; //+
     public static Action<AchievementRestriction, int> SetAchievementValue;
     public static Action LoadAchievements;
 }

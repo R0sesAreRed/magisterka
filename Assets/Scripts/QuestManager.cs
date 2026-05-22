@@ -5,11 +5,10 @@ using UnityEngine;
 
 public class QuestManager : MonoBehaviour
 {
-
     public List<QuestData> allQuests = new List<QuestData>();
     void Start()
     {
-
+        
     }
     void Update()
     {
@@ -45,7 +44,11 @@ public class QuestManager : MonoBehaviour
         string path = GetPath();
 
         if (!File.Exists(path))
+        {
+            DrawNewQuests();
             return GameManager.instance.playerCurrentQuests;
+        }
+            
 
         string json = File.ReadAllText(path);
 
@@ -75,7 +78,7 @@ public class QuestManager : MonoBehaviour
                 questCopy.targetValue = randomQuest.targetValue;
                 questCopy.rest = randomQuest.rest;
                 questCopy.currentValue = 0;
-                questCopy.completed = false;
+                questCopy.OneLevel = randomQuest.OneLevel;
                 questCopy.rewardCurrency = randomQuest.rewardCurrency;
                 var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Contains(c));
                 if (availableCosmetics.Count > 0)
@@ -89,13 +92,47 @@ public class QuestManager : MonoBehaviour
                 GameManager.instance.playerCurrentQuests.Add(questCopy);
             }
         }
+        Save(GameManager.instance.playerCurrentQuests);
     }
 
-    public void progressQuest()
+    public void progressQuest(QuestRestriction rest, int value)
     {
         if(GameManager.instance.questsOn)
         {
+            foreach(var quest in GameManager.instance.playerCurrentQuests)
+            {
+                if (quest.rest == rest)
+                {
+                    quest.currentValue += value;
+                    if (quest.currentValue >= quest.targetValue)
+                    {
+                        
+                        GameManager.instance.playerCurrentQuests.Remove(quest);
+                        onQuestComplete(quest);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
+    public void SingleLevelQuestComplete(QuestRestriction rest, int value)
+    {
+        if (GameManager.instance.questsOn)
+        {
+            foreach (var quest in GameManager.instance.playerCurrentQuests)
+            {
+                if (quest.rest == rest)
+                {
+                    if (value >= quest.targetValue)
+                    {
+                        
+                        GameManager.instance.playerCurrentQuests.Remove(quest);
+                        onQuestComplete(quest);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -104,22 +141,34 @@ public class QuestManager : MonoBehaviour
         if(GameManager.instance.shopAndCurrencyOn)
         {
             GameManager.instance.currency += compquest.rewardCurrency;
+            AccountUtility.UpdateAccountCurrency(GameManager.instance.currency);
         }
         else
         {
             GameManager.instance.playerCosmetics.Add(compquest.altReward);
         }
+        GameManager.instance.completedQuests++;
         DrawNewQuests();
+        Save(GameManager.instance.playerCurrentQuests);
+
     }
 
     void OnEnable()
     {
         QuestEvents.LoadQuests += () => GameManager.instance.playerCurrentQuests = Load();
+        QuestEvents.SaveQuests += (quests) => Save(quests);
+        QuestEvents.DrawQuests += () => DrawNewQuests();
+        QuestEvents.ProgressQuest += (rest, value) => progressQuest(rest, value);
+        QuestEvents.SingleLevelProgress += (rest, value) => SingleLevelQuestComplete(rest, value);
     }
 
     private void OnDisable()
     {
         QuestEvents.LoadQuests -= () => GameManager.instance.playerCurrentQuests = Load();
+        QuestEvents.SaveQuests -= (quests) => Save(quests);
+        QuestEvents.DrawQuests += () => DrawNewQuests();
+        QuestEvents.ProgressQuest -= (rest, value) => progressQuest(rest, value);
+        QuestEvents.SingleLevelProgress -= (rest, value) => SingleLevelQuestComplete(rest, value);
     }
 
 }
@@ -127,21 +176,26 @@ public class QuestManager : MonoBehaviour
 public static class QuestEvents
 {
     public static Action LoadQuests;
+    public static Action<List<QuestData>> SaveQuests;
+    public static Action DrawQuests;
+    public static Action<QuestRestriction, int> ProgressQuest;
+    public static Action<QuestRestriction, int> SingleLevelProgress;
 }
 
 
 //Questy:
-// rozegraj 2 melodii
-// rozegraj 5 melodii
-// rozegraj 10 melodii
-// przejdŸ melodiê z 100% trafieñ
-// w trakcie jednej melodii traf 5 perfekcyjnych trafieñ
-// w trakcie jednej melodii osi¹gnij 60% maksymalnego wyniku
-// zdob¹dŸ osi¹gniêcie
-// w trakcie jednej melodii traf 3 perfekcyjne trafienia pod rz¹d
-// ukoñcz melodiê
-// ukoñcz 3 melodie
-// ukoñcz 5 melodii
+// rozegraj 2 melodii                                               //melodie +
+// rozegraj 5 melodii                                               //melodie +
+// rozegraj 10 melodii                                              //melodie +
+// przejdŸ melodiê z 100% trafieñ                                   //100hits +
+// w trakcie jednej melodii traf 5 perfekcyjnych trafieñ            //perfecthits +
+// w trakcie jednej melodii traf 10 perfekcyjnych trafieñ           //pefrecthits +
+// w trakcie jednej melodii traf 15 perfekcyjnych trafieñ           //perfecthits +
+// w trakcie jednej melodii osi¹gnij 60% maksymalnego wyniku        //score +
+// zdob¹dŸ osi¹gniêcie                                              //achievement
+// ukoñcz melodiê                                                   //melodiefinish +
+// ukoñcz 3 melodie                                                 //melodiefinish +
+// ukoñcz 5 melodii                                                 //melodiefinish +
 
 
 public class QuestsDatabase

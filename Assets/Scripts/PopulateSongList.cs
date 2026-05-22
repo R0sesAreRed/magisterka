@@ -43,6 +43,10 @@ public class PopulateSongList : MonoBehaviour
         foreach (var item in GameManager.instance.importedFiles)
         {
             var go = Instantiate(songListItemPrefab, listParent.transform);
+            if(item == GameManager.instance.currentSong)
+                go.GetComponent<UnityEngine.UI.Image>().color = new Color(0.8f, 0.8f, 1f); // Podœwietlenie aktualnie wybranej piosenki
+            else
+                go.GetComponent<UnityEngine.UI.Image>().color = new Color(1f, 0.6839622f, 0.68396f); // Normalny kolor dla pozosta³ych
             go.GetComponent<SelectSongItemView>().Initialize(item, this, saveSystem);
         }
     }

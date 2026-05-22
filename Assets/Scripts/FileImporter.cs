@@ -42,8 +42,8 @@ public class FileImporter : MonoBehaviour
 
             item.Title = Path.GetFileNameWithoutExtension(selectedPath);
             item.FilePath = selectedPath;
-            item.HighScore = 0;
-            item.MaxScore = 0;
+            item.BestScore = 0;
+            item.Level = 0; //TODO: zrobiæ ¿eby level by³ liczony na podstawie trudnoœci piosenki
             item.added = true;
 
             GameManager.instance.importedFiles.Add(item);

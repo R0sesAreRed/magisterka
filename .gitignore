@@ -6,3 +6,9 @@ Logs/
 obj/
 UserSettings/
 *.sln
+
+# Minimal Firebase binary ignores for final project pushes
+Assets/Firebase/Plugins/
+Assets/Firebase/m2repository/
+Assets/Plugins/iOS/Firebase/
+Assets/Plugins/tvOS/Firebase/

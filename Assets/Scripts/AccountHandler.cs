@@ -8,7 +8,7 @@ public class AccountHandler : MonoBehaviour
     public GameObject AccountDisplay;
     public GameObject AccountDispPrefab;
     public List<AccountUtility.AccountData> accounts = new List<AccountUtility.AccountData>();
-
+    
     public void Start()
     {
         accounts = AccountUtility.LoadAccounts();
@@ -64,11 +64,16 @@ public class AccountHandler : MonoBehaviour
         DataCollection.instance.TotalTimePlayed = acc.TotalTimePlayed;
         GameManager.instance.loadSettings();
         GameEvents.LoadAchievements.Invoke();
+        GameManager.instance.playerCurrentQuests = new List<QuestData>();
         QuestEvents.LoadQuests.Invoke();
         CosmeticsEvents.LoadCosmetics.Invoke();
         CosmeticsEvents.LoadEquipped.Invoke(); //wczytywanie cosmetików
-
         gameObject.SetActive(false);
+        if(!GameManager.instance.tutorialCompleted)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadScene("Settings");
+            TutorialRoute.instance.currentTutorialStep = 0; 
+        }
     }
 }
 
@@ -144,7 +149,7 @@ public static class AccountUtility
         Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
     }
 
-    public static void UpdateAccountCurrency(int newCurrency) //<--- pamietac o tym
+    public static void UpdateAccountCurrency(int newCurrency)
     {
         var accounts = LoadAccounts();
         foreach (var acc in accounts)
@@ -160,7 +165,7 @@ public static class AccountUtility
         Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
     }
 
-    public static void UpdateAccountTimePlayed(double TimePlayed) //<--- pamietac o tym
+    public static void UpdateAccountTimePlayed(double TimePlayed)
     {
         var accounts = LoadAccounts();
         foreach (var acc in accounts)

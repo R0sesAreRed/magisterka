@@ -9,8 +9,8 @@ public class QuestDataClass
     public int targetValue;
     public QuestRestriction rest;
     public int currentValue;
-    public bool completed;
     public int rewardCurrency;
+    public bool OneLevel;
     public CosmeticsData altReward;
 
 
@@ -21,8 +21,8 @@ public class QuestDataClass
         targetValue = item.targetValue;
         rest = item.rest;
         currentValue = item.currentValue;
-        completed = item.completed;
         rewardCurrency = item.rewardCurrency;
+        OneLevel = item.OneLevel;
         altReward = item.altReward;
     }
 
@@ -34,8 +34,8 @@ public class QuestDataClass
         copy.targetValue = targetValue;
         copy.rest = rest;
         copy.currentValue = currentValue;
-        copy.completed = completed;
         copy.rewardCurrency = rewardCurrency;
+        copy.OneLevel = OneLevel;
         copy.altReward = altReward;
         return copy;
     }

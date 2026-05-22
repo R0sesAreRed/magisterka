@@ -26,7 +26,9 @@ public class PopulateCosmeticsList : MonoBehaviour
         if (data.CurrencyCost <= GameManager.instance.currency)
         {
             GameManager.instance.currency -= data.CurrencyCost;
+            AccountUtility.UpdateAccountCurrency(GameManager.instance.currency);
             GameManager.instance.playerCosmetics.Add(data);
+            GameEvents.OnPurchaseItem.Invoke(1);
             CosmeticsEvents.SaveCosmetics?.Invoke();
             CosmeticsEvents.LoadCosmetics?.Invoke();
             RefreshList();

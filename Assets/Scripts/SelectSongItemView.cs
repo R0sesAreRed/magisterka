@@ -1,4 +1,4 @@
-using UnityEngine;
+    using UnityEngine;
 
 public class SelectSongItemView : MonoBehaviour
 {
@@ -15,8 +15,11 @@ public class SelectSongItemView : MonoBehaviour
         SelectButton.onClick.AddListener(SelectSong);
 
         transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = item.Title;
-        transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Najlepszy wynik: {item.HighScore}";
-        transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Maksymalny wynik: {item.MaxScore}";
+        transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Najlepszy wynik: {item.BestScore:F1}%";
+        if (GameManager.instance.levelsOn)
+            transform.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Poziom: {item.Level}";
+        else
+            transform.transform.GetChild(2).gameObject.SetActive(false);
         transform.GetChild(3).gameObject.SetActive(item.added);
         var deleteButton = transform.GetChild(3).GetComponent<UnityEngine.UI.Button>();
         deleteButton.onClick.RemoveAllListeners();
@@ -39,5 +42,6 @@ public class SelectSongItemView : MonoBehaviour
     {
         GameManager.instance.currentSong = songData;
         Debug.Log($"Selected song: {GameManager.instance.currentSong.FilePath}");
+        songList.RefreshList();
     }
 }

@@ -15,5 +15,6 @@ public class MainMenuUIMAnager : MonoBehaviour
         menuButtons[1].SetActive(GameManager.instance.leaderBoardOn);
         menuButtons[2].SetActive(GameManager.instance.shopAndCurrencyOn);
         menuButtons[3].SetActive(GameManager.instance.rewardsAndCosmeticOn);
+        menuButtons[4].SetActive(GameManager.instance.questsOn);
     }
 }

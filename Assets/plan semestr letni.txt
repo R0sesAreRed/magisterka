@@ -6,43 +6,37 @@
 12-13:tekst pracy
 
 1:praca nad aplikacją edukacyjną
--tryby gry:
-	po nucie
-	spadające klocki + metronom
 -grywalizacja:
 	poziomy
 +	punkty
 +	natychmiastowy feedback (ok, good, perfect, życia)
-50/50	cyfrowa waluta
-50/50	Zadania
-50/50	achievementy (badge)
-25/75	skinki
-+	paski progresu
-	leaderboard
+75/25?	cyfrowa waluta
++	Zadania
+75/25?	achievementy (badge)
+50/50	skinki
++?	paski progresu
++	leaderboard
 -ui:
-	wybieranie trybu gry 
-50/50	osiągnięcia
++	osiągnięcia
 +	ustawienia 
-	tablica wyników
++	tablica wyników
 -dodatki do gameplayu:
 +	natychmistowy feedback
-	skiny
-50/50	wyświetlanie powiadomień o osiągnięciach i zadaniach
++	skiny
++	wyświetlanie powiadomień o osiągnięciach i zadaniach
 		
-
-menu questów i logika questów
 
 gameUIManager -> funkcjonalność cosmeticow
 
-dodać progresje poziomów do ustawień
+opis ustawień
 progresja poziomów
 
+tutorial!
+stworzenie konta -> wybranie konta -> settings -> main menu (objaśnienie przycisków) -> 
 
-
-podpięcie bazy danych
-leaderboard (wygląd + działanie)
-zbieranie danych
->na podstawie zebranych danych progresuj questy
+1:352943496378:web:d30e7de07a06a576e87683 app id
+AIzaSyAsjmaW_VKT7T5bFFJ2lwWj-CG_RkbRo8c api key
+magisterka-6c50d projectid
 
 
 

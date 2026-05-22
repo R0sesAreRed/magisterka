@@ -12,6 +12,7 @@ using static UnityEngine.Rendering.DebugUI;
 public class GameUIManager : MonoBehaviour
 {
     public static GameUIManager instance;
+    private readonly SongSaveSystem songSaveSystem = new SongSaveSystem();
     [SerializeField] TextMeshProUGUI scoreText;
     [SerializeField] Image progressBar;
     [SerializeField] TextMeshProUGUI feedbackText;
@@ -74,7 +75,7 @@ public class GameUIManager : MonoBehaviour
     public double totalSongTime = 0;
     public double songTimePlayed = 0;
     private int score = 0; //punkty zdobywane w czasie gry
-    private double displayScore = 0; //punkty wyœwietlane na ekranie
+    private double displayScore = 0; //punkty wyï¿½wietlane na ekranie
     public int Score
     {
         get { return score; }
@@ -150,12 +151,12 @@ public class GameUIManager : MonoBehaviour
     }
 
 
-    public int CalculateScore(double hitTime, double noteStartTime, double releaseTime, double noteLength, GameManager.NK note) //pobawiæ siê tym ¿eby dobrze czu³o ró¿nice
+    public int CalculateScore(double hitTime, double noteStartTime, double releaseTime, double noteLength, GameManager.NK note) //pobawiï¿½ siï¿½ tym ï¿½eby dobrze czuï¿½o rï¿½nice
     {
         double timeDifference = Mathf.Abs((float)(hitTime - noteStartTime));
         double releaseDifference = Mathf.Abs((float)(releaseTime - (noteStartTime + noteLength)));
-        Debug.Log($"Nuta {note} ró¿nica czasu: {timeDifference}, ró¿nica release: {releaseDifference}");
-        if (timeDifference+releaseDifference <= 0.3f) // idealne trafienie 15
+        Debug.Log($"Nuta {note} rï¿½nica czasu: {timeDifference}, rï¿½nica release: {releaseDifference}");
+        if (timeDifference+releaseDifference <= 0.2f) // idealne trafienie 15
         {
             //Debug.Log("Perfekcyje trafienie");
             feedbackText.text = "Perfekcyjnie!";
@@ -165,7 +166,7 @@ public class GameUIManager : MonoBehaviour
             DataCollection.instance.PerfectNotes++;
             return 100;
         }
-        else if (timeDifference+releaseDifference <= 0.45f) // dobre trafienie 30
+        else if (timeDifference+releaseDifference <= 0.4f) // dobre trafienie 30
         {
             //Debug.Log("Dobre trafienie");
             feedbackText.text = "Dobrze!";
@@ -175,10 +176,10 @@ public class GameUIManager : MonoBehaviour
             DataCollection.instance.GoodNotes++;
             return 70;
         }
-        else if (timeDifference + releaseDifference <= 0.7f) // s³abe trafienie 45
+        else if (timeDifference + releaseDifference <= 0.6f) // sï¿½abe trafienie 45
         {
             feedbackText.text = "OK";
-            //Debug.Log("S³abe trafienie");
+            //Debug.Log("Sï¿½abe trafienie");
             HealthPoints += 50;
             GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
             GameEvents.OnHit?.Invoke(1);
@@ -201,19 +202,66 @@ public class GameUIManager : MonoBehaviour
 
     public void OnLevelComlete()
     {
-        GameEndMenu.SetActive(true);
-        GameEvents.OnCompleteLevel.Invoke(1);
         DataCollection.instance.LevelSuccess = true;
         DataCollection.instance.TotalTimePlayed += totalSongTime;
         AccountUtility.UpdateAccountTimePlayed(totalSongTime);
-        //achievements, questy
+
+        GameEvents.OnCompleteLevel.Invoke(1);
+        if (DataCollection.instance.MissedNotes == 0)
+            GameEvents.OnCompleteLevelHealthQuality.Invoke(1);
+        GameEvents.OnCompleteLevelQuality.Invoke((int)((DataCollection.instance.PerfectNotes/DataCollection.instance.TotalNotes)*100));
+
+        QuestEvents.ProgressQuest.Invoke(QuestRestriction.Melodie, 1);
+        QuestEvents.ProgressQuest.Invoke(QuestRestriction.MelodieFinish, 1);
+        if(DataCollection.instance.MissedNotes == 0)
+            QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.NoMisses, 1);
+        if(DataCollection.instance.TotalNotes * 60 <= score)
+            QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.Score, 1);
+        QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.PerfectHits, DataCollection.instance.PerfectNotes);
+
+
+        TurnOnEndMenu();
         DataCollection.instance.SubmitData();        
     }
     public void OnLevelLose()
     {
         DataCollection.instance.TotalTimePlayed += songTimePlayed;
-        GameEndMenu.SetActive(true);
+        AccountUtility.UpdateAccountTimePlayed(songTimePlayed);
+        QuestEvents.ProgressQuest.Invoke(QuestRestriction.Melodie, 1);
+        QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.PerfectHits, DataCollection.instance.PerfectNotes);
+        TurnOnEndMenu();
+
         DataCollection.instance.SubmitData();
+    }
+
+    public void TurnOnEndMenu()
+    {
+        GameEndMenu.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = LevelComplete ? "Wygrana!" : "Przegrana!";
+        double levelScore = DataCollection.instance.TotalNotes > 0
+            ? ((double)score / (double)(DataCollection.instance.TotalNotes * 100)) * 100
+            : 0;
+        Debug.Log("wynik: " + score + ", max wynik: " + DataCollection.instance.TotalNotes * 100 + ", procent: " + levelScore);
+        if (GameManager.instance.currentSong != null)
+        {
+            GameManager.instance.currentSong.BestScore = System.Math.Max(GameManager.instance.currentSong.BestScore, levelScore);
+
+            var storedSong = GameManager.instance.importedFiles.Find(song =>
+                song.Title == GameManager.instance.currentSong.Title &&
+                song.FilePath == GameManager.instance.currentSong.FilePath);
+
+            if (storedSong != null)
+            {
+                storedSong.BestScore = GameManager.instance.currentSong.BestScore;
+            }
+
+            songSaveSystem.Save(GameManager.instance.importedFiles);
+        }
+        GameEndMenu.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Wynik: {levelScore:F1}%";
+        if(GameManager.instance.questsOn)
+            GameEndMenu.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"UkoÅ„czono zadania: {GameManager.instance.completedQuests}";
+        else
+            GameEndMenu.transform.GetChild(2).gameObject.SetActive(false);
+        GameEndMenu.SetActive(true);
     }
     public void TurnOffEndMenu()
     {
@@ -238,6 +286,7 @@ public class GameUIManager : MonoBehaviour
     }
 }
 
-//co jest potrzebne ¿eby zresetowaæ poziom:
+//co jest potrzebne ï¿½eby zresetowaï¿½ poziom:
 //totalSongTime
 //songTimePlayed
+//questscompleted

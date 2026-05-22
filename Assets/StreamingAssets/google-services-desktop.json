@@ -1,0 +1,28 @@
+{
+  "project_info": {
+    "project_number": "352943496378",
+    "project_id": "magisterka-6c50d",
+    "storage_bucket": "magisterka-6c50d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352943496378:web:d30e7de07a06a576e87683",
+        "android_client_info": {
+          "package_name": "com.yourcompany.yourapp"
+        }
+      },
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsjmaW_VKT7T5bFFJ2lwWj-CG_RkbRo8c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
