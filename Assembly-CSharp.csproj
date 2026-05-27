@@ -82,6 +82,7 @@
     <Compile Include="Assets\Scripts\FallingNote.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\IStandaloneFileBrowser.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserLinux.cs" />
+    <Compile Include="Assets\Scripts\SettingsDescription.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleOpenFileText.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\StandaloneFileBrowserMac.cs" />
     <Compile Include="Assets\Scripts\CosmeticsManager.cs" />
@@ -636,8 +637,24 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@60ef35ffd3cd\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Firebase.App">
+      <HintPath>Assets\Firebase\Plugins\Firebase.App.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.Firestore">
+      <HintPath>Assets\Firebase\Plugins\Firebase.Firestore.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.TaskExtension">
+      <HintPath>Assets\Firebase\Plugins\Firebase.TaskExtension.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Ookii.Dialogs">
       <HintPath>Assets\StandaloneFileBrowser\Plugins\Ookii.Dialogs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.Auth">
+      <HintPath>Assets\Firebase\Plugins\Firebase.Auth.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Melanchall.DryWetMidi">
@@ -656,28 +673,12 @@
       <HintPath>Assets\StandaloneFileBrowser\Plugins\System.Windows.Forms.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Firebase.App">
-      <HintPath>Assets\Firebase\Plugins\Firebase.App.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Firebase.TaskExtension">
-      <HintPath>Assets\Firebase\Plugins\Firebase.TaskExtension.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.MiniJson">
-      <HintPath>Assets\Firebase\Plugins\Google.MiniJson.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Firebase.Auth">
-      <HintPath>Assets\Firebase\Plugins\Firebase.Auth.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Firebase.Platform">
       <HintPath>Assets\Firebase\Plugins\Firebase.Platform.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Firebase.Firestore">
-      <HintPath>Assets\Firebase\Plugins\Firebase.Firestore.dll</HintPath>
+    <Reference Include="Google.MiniJson">
+      <HintPath>Assets\Firebase\Plugins\Google.MiniJson.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Android.Types">

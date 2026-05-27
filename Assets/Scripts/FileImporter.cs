@@ -21,35 +21,39 @@ public class FileImporter : MonoBehaviour
 
     public void ImportFile()
     {
-        var extensions = new[] {
-        new ExtensionFilter("MIDI Files", "mid", "midi"),
-        new ExtensionFilter("All Files", "*" ),
-        };
-
-        string[] paths = StandaloneFileBrowser.OpenFilePanel(
-            "Select MIDI File",
-            "",
-            extensions,
-            false
-        );
-
-        if (paths.Length > 0)
+        if(GameManager.instance.tutorialCompleted)
         {
-            string selectedPath = paths[0];
-            Debug.Log("Selected file: " + selectedPath);
+            var extensions = new[] {
+            new ExtensionFilter("MIDI Files", "mid", "midi"),
+            new ExtensionFilter("All Files", "*" ),
+            };
 
-            var item = ScriptableObject.CreateInstance<SelectSongItem>();
+            string[] paths = StandaloneFileBrowser.OpenFilePanel(
+                "Select MIDI File",
+                "",
+                extensions,
+                false
+            );
 
-            item.Title = Path.GetFileNameWithoutExtension(selectedPath);
-            item.FilePath = selectedPath;
-            item.BestScore = 0;
-            item.Level = 0; //TODO: zrobiæ ¿eby level by³ liczony na podstawie trudnoœci piosenki
-            item.added = true;
+            if (paths.Length > 0)
+            {
+                string selectedPath = paths[0];
+                Debug.Log("Selected file: " + selectedPath);
 
-            GameManager.instance.importedFiles.Add(item);
-            Debug.Log("added song" + item.Title);
-            songList.RefreshList();
-            saveSystem.Save(GameManager.instance.importedFiles);
+                var item = ScriptableObject.CreateInstance<SelectSongItem>();
+
+                item.Title = Path.GetFileNameWithoutExtension(selectedPath);
+                item.FilePath = selectedPath;
+                item.BestScore = 0;
+                item.Level = 0; //TODO: zrobiæ ¿eby level by³ liczony na podstawie trudnoœci piosenki
+                item.added = true;
+
+                GameManager.instance.importedFiles.Add(item);
+                Debug.Log("added song" + item.Title);
+                songList.RefreshList();
+                saveSystem.Save(GameManager.instance.importedFiles);
+            }
         }
+        
     }
 }

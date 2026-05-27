@@ -25,6 +25,10 @@ public class FalingNotesSpawner : MonoBehaviour
             GameManager.instance.nextNoteIndex = 0;
             Debug.Log("[FalingNotesSpawner] songStartTime set to " + GameManager.instance.songStartTime);
         }
+        if(!GameManager.instance.tutorialCompleted)
+        {
+            Pause();
+        }
     }
 
     private IEnumerator Start() //UI zajmuje troche czasu u³ozenie sie po pocz¹tku sceny
@@ -143,17 +147,13 @@ public class FalingNotesSpawner : MonoBehaviour
             float pausedDuration = Time.time - pauseTime;
             GameManager.instance.songStartTime += pausedDuration;
             GameManager.instance.IsPaused = false;
-            Debug.Log("[FalingNotesSpawner] Unpausing. Calling TurnOffPauseMenu().");
             GameUIManager.instance.TurnOffPauseMenu();
-            Debug.Log("[FalingNotesSpawner] UnPaused. IsPaused after: " + GameManager.instance.IsPaused);
         }
         else
         {
             pauseTime = Time.time;
             GameManager.instance.IsPaused = true;
-            Debug.Log("[FalingNotesSpawner] Pausing. Calling TurnOnPauseMenu().");
             GameUIManager.instance.TurnOnPauseMenu();
-            Debug.Log("[FalingNotesSpawner] Paused. IsPaused after: " + GameManager.instance.IsPaused);
         }
     }
 
@@ -172,8 +172,26 @@ public class FalingNotesSpawner : MonoBehaviour
         GameUIManager.instance.TurnOffPauseMenu();
         //Debug.Log("unPaused");
     }
+
+    public void Pause()
+    {
+        pauseTime = Time.time;
+        GameManager.instance.IsPaused = true;
+    }
     public void Upause()
     {
         GameManager.instance.IsPaused = false;
+    }
+
+    public void UnpauseTutorial()
+    {
+        StartCoroutine(UnpauseTutorialEnum());
+    }
+
+    private IEnumerator UnpauseTutorialEnum()
+    {
+        Resume();
+        yield return new WaitForSeconds(4.5f);
+        Pause();
     }
 }

@@ -113,6 +113,7 @@ public class GameUIManager : MonoBehaviour
             if(fontcosmetic!= null && ScoreText.activeSelf)
             {
                 ScoreText.GetComponent<TMP_Text>().font = fontcosmetic.font;
+                Feedback.GetComponent<TMP_Text>().font = fontcosmetic.font;
             }
             var backgroundCosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Background);
             if(backgroundCosmetic!= null && Background.activeSelf)
@@ -202,26 +203,53 @@ public class GameUIManager : MonoBehaviour
 
     public void OnLevelComlete()
     {
-        DataCollection.instance.LevelSuccess = true;
-        DataCollection.instance.TotalTimePlayed += totalSongTime;
-        AccountUtility.UpdateAccountTimePlayed(totalSongTime);
+        if(totalSongTime > 0)
+        {
+            DataCollection.instance.LevelSuccess = true;
+            DataCollection.instance.TotalTimePlayed += totalSongTime;
+            AccountUtility.UpdateAccountTimePlayed(totalSongTime);
+            CosmeticsData rewardCosmetic = null;
+            if (GameManager.instance.achievementsOn)
+            {
+                GameEvents.OnCompleteLevel.Invoke(1);
+                if (DataCollection.instance.MissedNotes == 0)
+                    GameEvents.OnCompleteLevelHealthQuality.Invoke(1);
+                GameEvents.OnCompleteLevelQuality.Invoke((int)((DataCollection.instance.PerfectNotes / DataCollection.instance.TotalNotes) * 100));
+            }
+            if (GameManager.instance.questsOn)
+            {
+                QuestEvents.ProgressQuest.Invoke(QuestRestriction.Melodie, 1);
+                QuestEvents.ProgressQuest.Invoke(QuestRestriction.MelodieFinish, 1);
+                if (DataCollection.instance.MissedNotes == 0)
+                    QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.NoMisses, 1);
+                if (DataCollection.instance.TotalNotes * 60 <= score)
+                    QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.Score, 1);
+                QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.PerfectHits, DataCollection.instance.PerfectNotes);
+            }
+            else if (GameManager.instance.shopAndCurrencyOn)
+            {
+                GameManager.instance.currency += 100;
+                AccountUtility.UpdateAccountCurrency(GameManager.instance.currency);
+            }
+            else if (GameManager.instance.rewardsAndCosmeticOn)
+            {
+                var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Contains(c));
+                if (availableCosmetics.Count > 0)
+                {
+                    rewardCosmetic = availableCosmetics[UnityEngine.Random.Range(0, availableCosmetics.Count)];
+                }
+            }
 
-        GameEvents.OnCompleteLevel.Invoke(1);
-        if (DataCollection.instance.MissedNotes == 0)
-            GameEvents.OnCompleteLevelHealthQuality.Invoke(1);
-        GameEvents.OnCompleteLevelQuality.Invoke((int)((DataCollection.instance.PerfectNotes/DataCollection.instance.TotalNotes)*100));
-
-        QuestEvents.ProgressQuest.Invoke(QuestRestriction.Melodie, 1);
-        QuestEvents.ProgressQuest.Invoke(QuestRestriction.MelodieFinish, 1);
-        if(DataCollection.instance.MissedNotes == 0)
-            QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.NoMisses, 1);
-        if(DataCollection.instance.TotalNotes * 60 <= score)
-            QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.Score, 1);
-        QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.PerfectHits, DataCollection.instance.PerfectNotes);
 
 
-        TurnOnEndMenu();
-        DataCollection.instance.SubmitData();        
+            TurnOnEndMenu(rewardCosmetic);
+            DataCollection.instance.SubmitData();
+        }
+        else
+        {
+            TurnOnEndMenu(null);
+            Debug.LogWarning("Total song time is zero or negative, cannot complete level.");
+        }
     }
     public void OnLevelLose()
     {
@@ -229,13 +257,32 @@ public class GameUIManager : MonoBehaviour
         AccountUtility.UpdateAccountTimePlayed(songTimePlayed);
         QuestEvents.ProgressQuest.Invoke(QuestRestriction.Melodie, 1);
         QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.PerfectHits, DataCollection.instance.PerfectNotes);
-        TurnOnEndMenu();
+        TurnOnEndMenu(null);
 
         DataCollection.instance.SubmitData();
     }
 
-    public void TurnOnEndMenu()
+    public void TurnOnEndMenu(CosmeticsData cosm)
     {
+        if (totalSongTime <= 0)
+        {
+            var titleText = GameEndMenu.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>();
+            var scoreText = GameEndMenu.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>();
+            var detailsObj = GameEndMenu.transform.GetChild(2).gameObject;
+            var detailsText = detailsObj.GetComponent<TMPro.TextMeshProUGUI>();
+
+            titleText.text = "Błąd utworu";
+            scoreText.text = "Nie można obliczyć wyniku (czas utworu = 0).";
+
+            detailsObj.SetActive(true);
+            string songTitle = GameManager.instance.currentSong != null ? GameManager.instance.currentSong.Title : "(brak)";
+            string songPath = GameManager.instance.currentSong != null ? GameManager.instance.currentSong.FilePath : "(brak)";
+            detailsText.text = $"Zgłoszenie: sprawdź plik MIDI.\nTytuł: {songTitle}\nŚcieżka: {songPath}\nTotalNotes: {DataCollection.instance.TotalNotes}";
+
+            GameEndMenu.SetActive(true);
+            return;
+        }
+
         GameEndMenu.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = LevelComplete ? "Wygrana!" : "Przegrana!";
         double levelScore = DataCollection.instance.TotalNotes > 0
             ? ((double)score / (double)(DataCollection.instance.TotalNotes * 100)) * 100
@@ -252,13 +299,25 @@ public class GameUIManager : MonoBehaviour
             if (storedSong != null)
             {
                 storedSong.BestScore = GameManager.instance.currentSong.BestScore;
+                // Set Completed flag when level is successfully completed
+                if (LevelComplete)
+                {
+                    storedSong.Completed = true;
+                    GameManager.instance.currentSong.Completed = true;
+                }
             }
 
             songSaveSystem.Save(GameManager.instance.importedFiles);
         }
         GameEndMenu.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Wynik: {levelScore:F1}%";
-        if(GameManager.instance.questsOn)
+        if (GameManager.instance.questsOn && GameManager.instance.completedQuests > 0)
             GameEndMenu.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Ukończono zadania: {GameManager.instance.completedQuests}";
+        else if(GameManager.instance.questsOn && GameManager.instance.completedQuests <= 0)
+            GameEndMenu.transform.GetChild(2).gameObject.SetActive(false);
+        else if (GameManager.instance.shopAndCurrencyOn)
+            GameEndMenu.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Zdobyto walutę: 100$";
+        else if (GameManager.instance.rewardsAndCosmeticOn)
+            GameEndMenu.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = cosm != null ? $"Zdobyto przedmiot kosmetyczny: {cosm.name}" : "Brak nagrody kosmetycznej";
         else
             GameEndMenu.transform.GetChild(2).gameObject.SetActive(false);
         GameEndMenu.SetActive(true);

@@ -6,7 +6,7 @@ public class TutorialRoute : MonoBehaviour
 {
     public static TutorialRoute instance;
     public int currentTutorialStep = 0;
-    void Start()
+    void Awake()
     {
         if (instance == null && instance != this)
         {

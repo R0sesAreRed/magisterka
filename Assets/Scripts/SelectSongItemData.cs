@@ -7,6 +7,7 @@ public class SelectSongItemData
     public string FilePath;
     public double BestScore;
     public int Level;
+    public bool Completed;
     public bool added;
 
     public SelectSongItemData(SelectSongItem item)
@@ -15,6 +16,7 @@ public class SelectSongItemData
         FilePath = item.FilePath;
         BestScore = item.BestScore;
         Level = item.Level;
+        Completed = item.Completed;
         added = item.added;
     }
 
@@ -25,6 +27,7 @@ public class SelectSongItemData
         item.FilePath = FilePath;
         item.BestScore = BestScore;
         item.Level = Level;
+        item.Completed = Completed;
         item.added = added;
         return item;
     }

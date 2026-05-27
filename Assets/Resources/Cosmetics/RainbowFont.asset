@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
+  m_Name: RainbowFont
+  m_EditorClassIdentifier: 
+  id: 3
+  itemName: "Czcionka T\u0119cza"
+  type: 3
+  CurrencyCost: 700
+  SetNumber: 3
+  font: {fileID: 11400000, guid: 625e002b993516842a87cbbd9635714b, type: 2}
+  sprite: {fileID: 0}
+  colorWhite: {r: 0, g: 0, b: 0, a: 0}
+  colorBlack: {r: 0, g: 0, b: 0, a: 0}

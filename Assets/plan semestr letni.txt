@@ -7,14 +7,14 @@
 
 1:praca nad aplikacją edukacyjną
 -grywalizacja:
-	poziomy
++	poziomy
 +	punkty
 +	natychmiastowy feedback (ok, good, perfect, życia)
 75/25?	cyfrowa waluta
 +	Zadania
 75/25?	achievementy (badge)
 50/50	skinki
-+?	paski progresu
++?	paski progresu -> dodać do achievementów i poziomów może
 +	leaderboard
 -ui:
 +	osiągnięcia
@@ -28,11 +28,10 @@
 
 gameUIManager -> funkcjonalność cosmeticow
 
-opis ustawień
-progresja poziomów
+opis ustawień 75/25
+progresja poziomów +
 
-tutorial!
-stworzenie konta -> wybranie konta -> settings -> main menu (objaśnienie przycisków) -> 
+tutorial! +
 
 1:352943496378:web:d30e7de07a06a576e87683 app id
 AIzaSyAsjmaW_VKT7T5bFFJ2lwWj-CG_RkbRo8c api key

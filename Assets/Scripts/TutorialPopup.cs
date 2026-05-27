@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,7 +11,8 @@ public class TutorialPopup : MonoBehaviour
     public bool LastStep;
     void Start()
     {
-        gameObject.transform.GetComponent<UnityEngine.UI.Button>().onClick.RemoveAllListeners();
+        Debug.Log("Popup start initiated");
+        Debug.Log("current step : " + TutorialRoute.instance.currentTutorialStep + " my step " + myStep + " tutorialcompleted " + GameManager.instance.tutorialCompleted);
         if (TutorialRoute.instance.currentTutorialStep == myStep && !GameManager.instance.tutorialCompleted)
         {
             gameObject.SetActive(true);
@@ -18,25 +21,13 @@ public class TutorialPopup : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
-        if(nextPopup != null)
-        {
-            gameObject.transform.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => nextStep(nextPopup));
-        }
-        else if (!string.IsNullOrEmpty(nextSceneTutorialRoute))
-        {
-            gameObject.transform.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => NavigateToScene(nextSceneTutorialRoute));
-        }
-        else if (LastStep)
-        {
-            gameObject.transform.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => completeTutorial());
-        }
-        gameObject.transform.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => gameObject.SetActive(false));
+        
     }
 
     public void NavigateToScene(string nextScene)
     {
         SceneManager.LoadScene(nextScene);
-        TutorialRoute.instance.currentTutorialStep++;
+        
     }
     public void nextStep(GameObject GO)
     {
@@ -48,5 +39,31 @@ public class TutorialPopup : MonoBehaviour
         GameManager.instance.tutorialCompleted = true;
         TutorialRoute.instance.currentTutorialStep++;
         AccountUtility.UpdateAccountTutorialCompleted(true);
+    }
+
+    public void nextStepSkipLevels(GameObject GO)
+    {
+        if (GameManager.instance.levelsOn)
+        {
+            GO.SetActive(true);
+            TutorialRoute.instance.currentTutorialStep++;
+        }
+        else
+        {
+            nextPopup.SetActive(true);
+            TutorialRoute.instance.currentTutorialStep += 2;
+        }
+    }
+
+    public void nextStepAfterDelay(GameObject GO)
+    {
+        StartCoroutine(nextStepAfterDelayenum(GO));
+    }
+    private IEnumerator nextStepAfterDelayenum(GameObject GO)
+    {
+        yield return new WaitForSeconds(4.5f);
+        Debug.Log("Activating next popup after delay");
+        GO.SetActive(true);
+        TutorialRoute.instance.currentTutorialStep++;
     }
 }

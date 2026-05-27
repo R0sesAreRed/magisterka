@@ -12,19 +12,22 @@ public class KeyboardManager : MonoBehaviour
 {
     public static KeyboardManager instance;
 
-    [SerializeField] public GameObject[] Keys; //tablica przechowuj¹ca klawisze do przypiêcia
-    public Dictionary<GameManager.NK, GameObject> KeysDict; //s³ownik mapuj¹cy klawisze do nazw nut
-    private Dictionary<GameManager.NK, BoxCollider2D> KeyColliders; //s³ownik mapuj¹cy collidery klawiszy do nazw nut
-    public Dictionary<GameManager.NK, GameObject> KeyVisualsDict; //s³ownik trzymaj¹cy wizualn¹ czêœæ klawiszy
+    [SerializeField] public GameObject[] Keys; //tablica przechowujï¿½ca klawisze do przypiï¿½cia
+    public Dictionary<GameManager.NK, GameObject> KeysDict; //sï¿½ownik mapujï¿½cy klawisze do nazw nut
+    //private Dictionary<GameManager.NK, BoxCollider2D> KeyColliders; //sï¿½ownik mapujï¿½cy collidery klawiszy do nazw nut
+    public Dictionary<GameManager.NK, GameObject> KeyVisualsDict; //sï¿½ownik trzymajï¿½cy wizualnï¿½ czï¿½ï¿½ klawiszy
 
 
-    private Dictionary<GameManager.NK, Action<InputAction.CallbackContext>> performedDelegates; //s³ownik przechowuj¹cy delegaty dla zdarzeñ "performed"
-    private Dictionary<GameManager.NK, Action<InputAction.CallbackContext>> canceledDelegates; //s³ownik przechowuj¹cy delegaty dla zdarzeñ "canceled"
-    private Dictionary<GameManager.NK, float> lastCollisionTime = new(); //s³ownik przechowuj¹cy czas ostatniej kolizji dla ka¿dej nuty
-    private Dictionary<GameManager.NK, float> lastKeyPressTime = new(); //s³ownik przechowuj¹cy czas ostatniego naciœniêcia klawisza dla ka¿dej nuty
+    private Dictionary<GameManager.NK, Action<InputAction.CallbackContext>> performedDelegates; //sï¿½ownik przechowujï¿½cy delegaty dla zdarzeï¿½ "performed"
+    private Dictionary<GameManager.NK, Action<InputAction.CallbackContext>> canceledDelegates; //sï¿½ownik przechowujï¿½cy delegaty dla zdarzeï¿½ "canceled"
+    private Dictionary<GameManager.NK, float> lastCollisionTime = new(); //sï¿½ownik przechowujï¿½cy czas ostatniej kolizji dla kaï¿½dej nuty
+    private Dictionary<GameManager.NK, float> lastKeyPressTime = new(); //sï¿½ownik przechowujï¿½cy czas ostatniego naciï¿½niï¿½cia klawisza dla kaï¿½dej nuty
 
     private Dictionary<GameManager.NK, Queue<NoteTiming>> noteTimings = new();
-
+    private Dictionary<GameManager.NK, bool> isKeyPressed = new(); //track which keys are currently held down
+    private Dictionary<GameManager.NK, bool> hasActiveCollision = new(); //track which lanes have active collisions
+    private Dictionary<GameManager.NK, Color> keyDefaultColors = new(); //store each key's original idle color
+    private HashSet<long> penalizedChordStarts = new(); //dedupe health penalty for the same chord across lanes
 
     public float ScreenHeight = 0;
     private void Awake()
@@ -38,18 +41,20 @@ public class KeyboardManager : MonoBehaviour
         else if (instance != this)
         {
             Destroy(gameObject);
+            return;
         } //dok instancji
         ScreenHeight = this.GetComponent<RectTransform>().rect.height;
         KeysDict = new Dictionary<GameManager.NK, GameObject>();
-        KeyColliders = new Dictionary<GameManager.NK, BoxCollider2D>();
+        //KeyColliders = new Dictionary<GameManager.NK, BoxCollider2D>();
         KeyVisualsDict = new Dictionary<GameManager.NK, GameObject>();
 
         for (int i = 0; i < Keys.Length && i < Enum.GetValues(typeof(GameManager.NK)).Length; i++)
         {
             KeysDict[(GameManager.NK)i] = Keys[i];
             KeysDict[(GameManager.NK)i].name = ((GameManager.NK)i).ToString();
-            KeyColliders[(GameManager.NK)i] = Keys[i].GetComponentInChildren<BoxCollider2D>();
+            //KeyColliders[(GameManager.NK)i] = Keys[i].GetComponentInChildren<BoxCollider2D>();
             KeyVisualsDict[(GameManager.NK)i] = Keys[i].transform.GetChild(0).gameObject;
+            keyDefaultColors[(GameManager.NK)i] = KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().color;
             //Debug.Log(KeyVisualsDict[(GameManager.NK)i]);
             var detector = Keys[i].GetComponent<KeyCollisionDetector>();
             if (detector != null)
@@ -61,19 +66,47 @@ public class KeyboardManager : MonoBehaviour
 
     }
 
+    private bool noteTimingsInitialized = false;
+
     private void Start()
     {
-        foreach (var noteData in GameManager.instance.CurrMidiNotes)
+        StartCoroutine(InitializeNoteTimingsWhenReady());
+    }
+
+    private IEnumerator InitializeNoteTimingsWhenReady()
+    {
+        while (GameManager.instance == null || GameManager.instance.CurrMidiNotes == null)
+        {
+            yield return null;
+        }
+
+        if (noteTimingsInitialized)
+        {
+            yield break;
+        }
+
+        BuildNoteTimings(GameManager.instance.CurrMidiNotes);
+        noteTimingsInitialized = true;
+    }
+
+    private void BuildNoteTimings(List<GameManager.Notes> midiNotes)
+    {
+        noteTimings.Clear();
+        penalizedChordStarts.Clear();
+
+        foreach (var noteData in midiNotes)
         {
             if (!noteTimings.ContainsKey(noteData.Note))
+            {
                 noteTimings[noteData.Note] = new Queue<NoteTiming>();
+            }
 
             noteTimings[noteData.Note].Enqueue(new NoteTiming
             {
                 noteStartTime = (noteData.StartTime / 1000.0) + 1.5f,
                 noteLength = (noteData.Length / 1000.0)
             });
-            //Debug.Log($"Zarejestrowano nutê {noteData.Note} z czasem startu {noteTimings[noteData.Note].noteStartTime} i d³ugoœci¹ {noteTimings[noteData.Note].noteLength}");
+            //Debug.Log($"Zarejestrowano nutï¿½ {noteData.Note} z czasem startu {noteTimings[noteData.Note].noteStartTime} i dï¿½ugoï¿½ciï¿½ {noteTimings[noteData.Note].noteLength}");
         }
     }
 
@@ -100,7 +133,7 @@ public class KeyboardManager : MonoBehaviour
         }
     }
 
-    private void OnDisable() //odpiananie funkcji przy wy³¹czeniu skryptu
+    private void OnDisable() //odpiananie funkcji przy wyï¿½ï¿½czeniu skryptu
     {
         foreach (GameManager.NK note in Enum.GetValues(typeof(GameManager.NK)))
         {
@@ -121,7 +154,7 @@ public class KeyboardManager : MonoBehaviour
     {
         foreach (var timing in queue)
         {
-            // Za³ó¿my, ¿e nuta jest aktywna, jeœli jej startTime <= currentTime < startTime + noteLength + tolerancja
+            // Zaï¿½ï¿½my, ï¿½e nuta jest aktywna, jeï¿½li jej startTime <= currentTime < startTime + noteLength + tolerancja
             if (!timing.scored && currentTime >= timing.noteStartTime && currentTime <= timing.noteStartTime + timing.noteLength)
             {
                 return timing;
@@ -132,6 +165,7 @@ public class KeyboardManager : MonoBehaviour
     private void OnKeyPerformed(GameManager.NK note, InputAction.CallbackContext ctx)
     {
         KeyPressColor(ctx, note);
+        lastKeyPressTime[note] = Time.time;
 
         double hitTime = GetCurrentSongTime();
         if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
@@ -167,10 +201,10 @@ public class KeyboardManager : MonoBehaviour
             timing.hitTime = null;
             timing.releaseTime = null;
 
-            // Usuñ tê nutê z kolejki, bo zosta³a ju¿ zagrana
+            // Usuï¿½ tï¿½ nutï¿½ z kolejki, bo zostaï¿½a juï¿½ zagrana
             if (noteTimings.TryGetValue(note, out var queue2))
             {
-                // ZnajdŸ i usuñ tê nutê z kolejki
+                // Znajdï¿½ i usuï¿½ tï¿½ nutï¿½ z kolejki
                 var arr = queue2.ToArray();
                 queue2.Clear();
                 foreach (var t in arr)
@@ -189,7 +223,7 @@ public class KeyboardManager : MonoBehaviour
         public double noteLength;
         public double? hitTime;
         public double? releaseTime;
-        public bool scored = false; // czy ju¿ przyznano punkty za tê nutê
+        public bool scored = false; // czy juï¿½ przyznano punkty za tï¿½ nutï¿½
     }
 
     private double GetCurrentSongTime()
@@ -201,33 +235,70 @@ public class KeyboardManager : MonoBehaviour
 
     private void KeyPressColor(InputAction.CallbackContext context, GameManager.NK note)
     {
-        KeyVisualsDict[note].GetComponent<Image>().color = KeyVisualsDict[note].GetComponent<Image>().color == Color.white ? Color.gray : Color.blue;
+        isKeyPressed[note] = true;
+        UpdateKeyColor(note);
     }
     private void KeyReleaseColor(InputAction.CallbackContext context, GameManager.NK note)
     {
-        KeyVisualsDict[note].GetComponent<Image>().color = KeyVisualsDict[note].GetComponent<Image>().color == Color.gray ? Color.white : Color.black;
+        isKeyPressed[note] = false;
+        UpdateKeyColor(note);
+    }
+
+    private Color ComputeKeyColor(GameManager.NK note)
+    {
+        bool keyPressed = isKeyPressed.ContainsKey(note) && isKeyPressed[note];
+        bool collisionActive = hasActiveCollision.ContainsKey(note) && hasActiveCollision[note];
+
+        // Key pressed + collision active = gray (correct timing)
+        if (keyPressed && collisionActive)
+        {
+            return Color.gray;
+        }
+        // Key pressed + no collision = muted red (wrong timing, key pressed when no note present)
+        else if (keyPressed && !collisionActive)
+        {
+            return new Color(1f, 0.4f, 0.4f); // Muted red
+        }
+        // Collision active + key not pressed = muted red (late/missed, note present but key not pressed)
+        else if (!keyPressed && collisionActive)
+        {
+            return new Color(1f, 0.4f, 0.4f); // Muted red
+        }
+        // Neither = return to key's default color (white for white keys, black for black keys)
+        else
+        {
+            return keyDefaultColors.ContainsKey(note) ? keyDefaultColors[note] : Color.white;
+        }
+    }
+
+    private void UpdateKeyColor(GameManager.NK note)
+    {
+        Color newColor = ComputeKeyColor(note);
+        KeyVisualsDict[note].GetComponent<Image>().color = newColor;
     }
 
 
     public void RegisterCollision(GameManager.NK note, float time)
     {
         lastCollisionTime[note] = time;
+        hasActiveCollision[note] = true;
+        UpdateKeyColor(note);
 
         if (lastKeyPressTime.TryGetValue(note, out float pressTime))
         {
             float delta = pressTime - time;
             if (delta >= -0.1f && delta <= 0.1f)
             {
-                GameUIManager.instance.Score += 10; //??
-                lastKeyPressTime.Remove(note); //zapobiega podwójnym punktom
-                //Debug.Log($"Punkty (kolizja po naciœniêciu): {GameManager.instance.Score}");
+                //GameUIManager.instance.Score += 10; //??
+                lastKeyPressTime.Remove(note); //zapobiega podwï¿½jnym punktom
+                //Debug.Log($"Punkty (kolizja po naciï¿½niï¿½ciu): {GameManager.instance.Score}");
             }
         }
     }
     private List<NoteTiming> FindMissedChordNotes(Queue<NoteTiming> queue, double currentTime)
     {
         List<NoteTiming> missedNotes = new List<NoteTiming>();
-        // Szukamy najwczeœniejszego niezaliczonego startu
+        // Szukamy najwczeï¿½niejszego niezaliczonego startu
         double? earliestStart = null;
         foreach (var timing in queue)
         {
@@ -255,12 +326,15 @@ public class KeyboardManager : MonoBehaviour
     {
         if (lastCollisionTime.ContainsKey(note))
         {
+            hasActiveCollision[note] = false;
+            UpdateKeyColor(note);
+
             if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
             {
-                double currentTime = GetCurrentSongTime();
-                var missedNotes = FindMissedChordNotes(queue, currentTime);
+                double missCheckTime = exitTime - GameManager.instance.songStartTime;
+                var missedNotes = FindMissedChordNotes(queue, missCheckTime);
 
-                // Jeœli s¹ nuty do rozliczenia
+                // Jeï¿½li sï¿½ nuty do rozliczenia
                 if (missedNotes.Count > 0)
                 {
                     // Rozlicz miss tylko raz dla akordu
@@ -278,8 +352,14 @@ public class KeyboardManager : MonoBehaviour
                         GameUIManager.instance.Score += score;
                         timing.scored = true;
                     }
-                    GameUIManager.instance.HealthPoints -= 1000;
-                    // Usuñ rozliczone nuty z kolejki
+
+                    long chordKey = (long)Math.Round(missedNotes[0].noteStartTime * 10000.0);
+                    if (penalizedChordStarts.Add(chordKey))
+                    {
+                        GameUIManager.instance.HealthPoints -= 1000;
+                    }
+
+                    // Usuï¿½ rozliczone nuty z kolejki
                     var arr = queue.ToArray();
                     queue.Clear();
                     foreach (var t in arr)

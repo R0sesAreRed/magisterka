@@ -12,6 +12,7 @@ public class CosmeticsDataClass
     public int SetNumber;
     public TMP_FontAsset? font;
     public Sprite? sprite;
+    public Sprite[]? keySprites;
     public Color colorWhite;
     public Color colorBlack;
 
@@ -24,6 +25,7 @@ public class CosmeticsDataClass
         SetNumber = item.SetNumber;
         font = item.font; // mo¿e byæ null
         sprite = item.sprite; // mo¿e byæ null
+        keySprites = item.keySprites;
         colorWhite = item.colorWhite; // sprawdŸ konwencjê na "brak koloru"
         colorBlack = item.colorBlack; // sprawdŸ konwencjê na "brak koloru"
     }
@@ -38,6 +40,7 @@ public class CosmeticsDataClass
         copy.SetNumber = SetNumber;
         copy.font = font; // mo¿e byæ null
         copy.sprite = sprite; // mo¿e byæ null
+        copy.keySprites = keySprites;
         copy.colorWhite = colorWhite; // sprawdŸ konwencjê na "brak koloru"
         copy.colorBlack = colorBlack; // sprawdŸ konwencjê na "brak koloru"
         return copy;

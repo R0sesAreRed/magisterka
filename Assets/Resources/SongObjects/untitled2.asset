@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Title: Untitled2
   FilePath: Assets/Midis/Untitled2.mid
-  HighScore: 0
-  MaxScore: 100
+  BestScore: 0
+  Level: 1
+  Completed: 0
   added: 0
