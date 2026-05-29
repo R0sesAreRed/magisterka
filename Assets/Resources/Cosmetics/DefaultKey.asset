@@ -12,12 +12,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
   m_Name: DefaultKey
   m_EditorClassIdentifier: 
-  id: 7
+  id: 6
   itemName: Podstawowe klawisze
   type: 2
   CurrencyCost: 0
   SetNumber: 0
   font: {fileID: 0}
-  sprite: {fileID: 8414707829236898450, guid: ab3a762684f0d5f448ad1472acddc8ef, type: 3}
+  sprite: {fileID: 6340639329951915335, guid: c5cb260ecd79b28418a29bdc0ab68447, type: 3}
+  tiled: 0
+  keySprites:
+  - {fileID: -3156094549444955038, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: -1992675726, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 283771258, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 1960333940, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 1032611537, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 1544876227, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 1680794507, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: -23382563, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 1962176279, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 806812984, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: -1873241799, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 1883052978, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 723111085, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: 853798999, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
+  - {fileID: -157100308, guid: ce8644da8e330f243a2fd844bc00b6a1, type: 3}
   colorWhite: {r: 1, g: 1, b: 1, a: 0}
   colorBlack: {r: 1, g: 1, b: 1, a: 0}

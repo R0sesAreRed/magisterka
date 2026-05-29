@@ -11,6 +11,7 @@ public class CosmeticsData : ScriptableObject
     public int SetNumber;
     public TMP_FontAsset? font;
     public Sprite? sprite;
+    public bool tiled;
     public Sprite[]? keySprites;
     public Color colorWhite;
     public Color colorBlack;

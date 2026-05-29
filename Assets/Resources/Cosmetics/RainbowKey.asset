@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
+  m_Name: RainbowKey
+  m_EditorClassIdentifier: 
+  id: 14
+  itemName: "Klawisze T\u0119cza"
+  type: 2
+  CurrencyCost: 0
+  SetNumber: 3
+  font: {fileID: 0}
+  sprite: {fileID: 6340639329951915335, guid: 234b98e907c40084ca2d5b6cc1997630, type: 3}
+  tiled: 0
+  keySprites:
+  - {fileID: -2214030042083541021, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: 656860549, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: 2006933704, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -1774233490, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: 263811602, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: 775703246, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -502836767, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -751006151, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -1857500288, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -606965463, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -839900545, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -281835855, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: -2045881070, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: 1796887119, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  - {fileID: 380175274, guid: f6d0ab797f133744f86dc84db2a1d7dc, type: 3}
+  colorWhite: {r: 0, g: 0, b: 0, a: 0}
+  colorBlack: {r: 0, g: 0, b: 0, a: 0}

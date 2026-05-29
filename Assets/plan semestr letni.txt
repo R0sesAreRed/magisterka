@@ -10,10 +10,10 @@
 +	poziomy
 +	punkty
 +	natychmiastowy feedback (ok, good, perfect, życia)
-75/25?	cyfrowa waluta
+75/25?	cyfrowa waluta -> zweryfikować
 +	Zadania
-75/25?	achievementy (badge)
-50/50	skinki
+75/25?	achievementy (badge) -> zweryfikować
++	skinki
 +?	paski progresu -> dodać do achievementów i poziomów może
 +	leaderboard
 -ui:
@@ -24,19 +24,19 @@
 +	natychmistowy feedback
 +	skiny
 +	wyświetlanie powiadomień o osiągnięciach i zadaniach
-		
 
-gameUIManager -> funkcjonalność cosmeticow
 
-opis ustawień 75/25
-progresja poziomów +
+opis ustawień 90/10 -> paski postępu
+paski postępu na levelach, questach i achievementach
+tryb weryfikacji
+ankietka
+ukraść odpowiednie midi
+rozwinąć przetwarzanie midi może?
 
-tutorial! +
+punkty
+paski postępu
+
 
 1:352943496378:web:d30e7de07a06a576e87683 app id
 AIzaSyAsjmaW_VKT7T5bFFJ2lwWj-CG_RkbRo8c api key
 magisterka-6c50d projectid
-
-
-
-	

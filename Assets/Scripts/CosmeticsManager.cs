@@ -7,7 +7,9 @@ public class CosmeticsManager : MonoBehaviour
 {
     public List<CosmeticsData> AllCosmetics = new List<CosmeticsData>();
     
-
+    public List<CosmeticsData> defaultEquippedCosmetics = new List<CosmeticsData>();
+    public List<CosmeticsData> defaultPlayerCosmetics = new List<CosmeticsData>();
+ 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -23,28 +25,28 @@ public class CosmeticsManager : MonoBehaviour
     private string GetPath()
     {
         if (GameManager.instance.SelectedAccount != null)
-            return Path.Combine(Application.persistentDataPath, $"{GameManager.instance.SelectedAccount}_Cosmetics.json");
+            return Path.Combine(Application.persistentDataPath, $"{GameManager.instance.SelectedAccount}_PlayerCosmetics.json");
         else
-            return Path.Combine(Application.persistentDataPath, "default_Cosmetics.json");
+            return Path.Combine(Application.persistentDataPath, "default_PlayerCosmetics.json");
     }
     private string GetPathEquipped()
     {
         if (GameManager.instance.SelectedAccount != null)
-            return Path.Combine(Application.persistentDataPath, $"{GameManager.instance.SelectedAccount}_Cosmetics.json");
+            return Path.Combine(Application.persistentDataPath, $"{GameManager.instance.SelectedAccount}_EquippedCosmetics.json");
         else
-            return Path.Combine(Application.persistentDataPath, "default_Cosmetics.json");
+            return Path.Combine(Application.persistentDataPath, "default_EquippedCosmetics.json");
     }
 
     public void Save(List<CosmeticsData> items)
     {
-        CosmeticsDatabase db = new CosmeticsDatabase();
-
+        // Save only IDs to keep save files small and avoid recreating ScriptableObjects
+        CosmeticsIdDatabase idDb = new CosmeticsIdDatabase();
         foreach (var item in items)
         {
-            db.cosm.Add(new CosmeticsDataClass(item));
+            idDb.ids.Add(item.id);
         }
 
-        string json = JsonUtility.ToJson(db, true);
+        string json = JsonUtility.ToJson(idDb, true);
         File.WriteAllText(GetPath(), json);
     }
 
@@ -53,32 +55,52 @@ public class CosmeticsManager : MonoBehaviour
         string path = GetPath();
 
         if (!File.Exists(path))
-            return GameManager.instance.playerCosmetics;
+            return defaultPlayerCosmetics;
 
         string json = File.ReadAllText(path);
-
-        CosmeticsDatabase db = JsonUtility.FromJson<CosmeticsDatabase>(json);
-
+        // Try new ID-based format first
+        CosmeticsIdDatabase idDb = JsonUtility.FromJson<CosmeticsIdDatabase>(json);
         List<CosmeticsData> result = new List<CosmeticsData>();
 
-        foreach (var data in db.cosm)
+        if (idDb != null && idDb.ids != null && idDb.ids.Count > 0)
         {
-            result.Add(data.ToScriptableObject());
+            foreach (var id in idDb.ids)
+            {
+                var asset = GameManager.instance.allCosmetics.Find(a => a.id == id);
+                if (asset != null)
+                    result.Add(asset);
+                else
+                    Debug.LogWarning($"CosmeticsManager: saved cosmetic id {id} not found in allCosmetics.");
+            }
+            Debug.Log("loaded cosmetics (ids)");
+            return result;
         }
-        Debug.Log("loeadedcosmetics");
+
+        // Fallback to old full-data format for backward compatibility
+        CosmeticsDatabase db = JsonUtility.FromJson<CosmeticsDatabase>(json);
+        if (db != null && db.cosm != null && db.cosm.Count > 0)
+        {
+            foreach (var data in db.cosm)
+            {
+                result.Add(data.ToScriptableObject());
+            }
+            Debug.Log("loaded cosmetics (legacy data)");
+            return result;
+        }
+
+        Debug.LogWarning("CosmeticsManager: no cosmetics data found in file.");
         return result;
     }
 
     public void SaveEquipped(List<CosmeticsData> items)
     {
-        CosmeticsDatabase db = new CosmeticsDatabase();
-
+        CosmeticsIdDatabase idDb = new CosmeticsIdDatabase();
         foreach (var item in items)
         {
-            db.cosm.Add(new CosmeticsDataClass(item));
+            idDb.ids.Add(item.id);
         }
 
-        string json = JsonUtility.ToJson(db, true);
+        string json = JsonUtility.ToJson(idDb, true);
         File.WriteAllText(GetPathEquipped(), json);
     }
 
@@ -87,36 +109,77 @@ public class CosmeticsManager : MonoBehaviour
         string path = GetPathEquipped();
 
         if (!File.Exists(path))
-            return GameManager.instance.playerCosmetics;
+            return defaultEquippedCosmetics;
 
         string json = File.ReadAllText(path);
-
-        CosmeticsDatabase db = JsonUtility.FromJson<CosmeticsDatabase>(json);
-
+        // Try id-based format
+        CosmeticsIdDatabase idDb = JsonUtility.FromJson<CosmeticsIdDatabase>(json);
         List<CosmeticsData> result = new List<CosmeticsData>();
 
-        foreach (var data in db.cosm)
+        if (idDb != null && idDb.ids != null && idDb.ids.Count > 0)
         {
-            result.Add(data.ToScriptableObject());
+            foreach (var id in idDb.ids)
+            {
+                var asset = GameManager.instance.allCosmetics.Find(a => a.id == id);
+                if (asset != null)
+                    result.Add(asset);
+                else
+                    Debug.LogWarning($"CosmeticsManager: equipped cosmetic id {id} not found in allCosmetics.");
+            }
+            Debug.Log("loaded equipped cosmetics (ids)");
+            return result;
         }
-        Debug.Log("loeadedcosmetics");
+
+        // Fallback to legacy format
+        CosmeticsDatabase db = JsonUtility.FromJson<CosmeticsDatabase>(json);
+        if (db != null && db.cosm != null && db.cosm.Count > 0)
+        {
+            foreach (var data in db.cosm)
+            {
+                result.Add(data.ToScriptableObject());
+            }
+            Debug.Log("loaded equipped cosmetics (legacy data)");
+            return result;
+        }
+
+        Debug.LogWarning("CosmeticsManager: no equipped cosmetics data found in file.");
         return result;
     }
 
     void OnEnable()
     {
-        CosmeticsEvents.SaveCosmetics += () => Save(GameManager.instance.playerCosmetics);
-        CosmeticsEvents.SaveEquipped += () => SaveEquipped(GameManager.instance.playerEquippedCosmetics);
-        CosmeticsEvents.LoadCosmetics += () => GameManager.instance.playerCosmetics = Load();
-        CosmeticsEvents.LoadEquipped += () => GameManager.instance.playerEquippedCosmetics = LoadEquipped();
+        CosmeticsEvents.SaveCosmetics += HandleSaveCosmetics;
+        CosmeticsEvents.SaveEquipped += HandleSaveEquipped;
+        CosmeticsEvents.LoadCosmetics += HandleLoadCosmetics;
+        CosmeticsEvents.LoadEquipped += HandleLoadEquipped;
     }
 
     private void OnDisable()
     {
-        CosmeticsEvents.SaveCosmetics -= () => Save(GameManager.instance.playerCosmetics);
-        CosmeticsEvents.SaveEquipped -= () => SaveEquipped(GameManager.instance.playerEquippedCosmetics);
-        CosmeticsEvents.LoadCosmetics -= () => GameManager.instance.playerCosmetics = Load();
-        CosmeticsEvents.LoadEquipped -= () => GameManager.instance.playerEquippedCosmetics = LoadEquipped();
+        CosmeticsEvents.SaveCosmetics -= HandleSaveCosmetics;
+        CosmeticsEvents.SaveEquipped -= HandleSaveEquipped;
+        CosmeticsEvents.LoadCosmetics -= HandleLoadCosmetics;
+        CosmeticsEvents.LoadEquipped -= HandleLoadEquipped;
+    }
+
+    private void HandleSaveCosmetics()
+    {
+        Save(GameManager.instance.playerCosmetics);
+    }
+
+    private void HandleSaveEquipped()
+    {
+        SaveEquipped(GameManager.instance.playerEquippedCosmetics);
+    }
+
+    private void HandleLoadCosmetics()
+    {
+        GameManager.instance.playerCosmetics = Load();
+    }
+
+    private void HandleLoadEquipped()
+    {
+        GameManager.instance.playerEquippedCosmetics = LoadEquipped();
     }
 
 
@@ -133,4 +196,9 @@ public static class CosmeticsEvents
 public class CosmeticsDatabase
 {
     public List<CosmeticsDataClass> cosm = new List<CosmeticsDataClass>();
+}
+
+public class CosmeticsIdDatabase
+{
+    public List<int> ids = new List<int>();
 }

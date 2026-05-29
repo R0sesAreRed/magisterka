@@ -199,15 +199,6 @@ public class PopulateScoreboard : MonoBehaviour
         {
             rowImage.color = targetColor;
         }
-
-        for (int i = 0; i < row.transform.childCount; i++)
-        {
-            TMP_Text childText = row.transform.GetChild(i).GetComponent<TMP_Text>();
-            if (childText != null)
-            {
-                childText.color = isCurrentPlayer ? Color.black : Color.white;
-            }
-        }
     }
 
     private void TMP_TextOrText(Transform child, string value)

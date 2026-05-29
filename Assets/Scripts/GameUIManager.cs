@@ -99,6 +99,10 @@ public class GameUIManager : MonoBehaviour
         {
             ScoreText.SetActive(false);
         }
+        else
+        {
+            ScoreText.GetComponent<TMP_Text>().font = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font)?.font;
+        }
         if(!GameManager.instance.progressBarOn)
         {
             ProgressBar.SetActive(false);
@@ -107,21 +111,26 @@ public class GameUIManager : MonoBehaviour
         {
             Feedback.SetActive(false);
         }
-        if(!GameManager.instance.rewardsAndCosmeticOn)
+        else
         {
-            var fontcosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font);
-            if(fontcosmetic!= null && ScoreText.activeSelf)
-            {
-                ScoreText.GetComponent<TMP_Text>().font = fontcosmetic.font;
-                Feedback.GetComponent<TMP_Text>().font = fontcosmetic.font;
-            }
-            var backgroundCosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Background);
-            if(backgroundCosmetic!= null && Background.activeSelf)
-            {
-                Background.GetComponent<Image>().sprite = backgroundCosmetic.sprite;
-                Background.GetComponent<Image>().color = backgroundCosmetic.colorWhite;
-            }
+            Feedback.GetComponent<TMP_Text>().font = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font)?.font;
         }
+        // if(!GameManager.instance.rewardsAndCosmeticOn)
+        // {
+        //     var fontcosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font);
+        //     if(fontcosmetic!= null && ScoreText.activeSelf)
+        //     {
+        //         ScoreText.GetComponent<TMP_Text>().font = fontcosmetic.font;
+        //         Feedback.GetComponent<TMP_Text>().font = fontcosmetic.font;
+        //     }
+        //     var backgroundCosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Background);
+        //     if(backgroundCosmetic!= null && Background.activeSelf)
+        //     {
+        //         Background.GetComponent<Image>().sprite = backgroundCosmetic.sprite;
+        //         Background.GetComponent<Image>().color = backgroundCosmetic.colorWhite;
+        //     }
+        // }
+        Background.GetComponent<Image>().sprite = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Background)?.sprite;
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -136,7 +145,7 @@ public class GameUIManager : MonoBehaviour
         if (displayScore < score)
         {
             displayScore += 1f; //0.1f
-            scoreText.text = "Score: " + ((int)displayScore).ToString();
+            scoreText.text = "Wynik: " + ((int)displayScore).ToString();
         }
         if (!GameManager.instance.IsPaused)
         {
@@ -233,7 +242,7 @@ public class GameUIManager : MonoBehaviour
             }
             else if (GameManager.instance.rewardsAndCosmeticOn)
             {
-                var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Contains(c));
+                var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Exists(p => p.id == c.id));
                 if (availableCosmetics.Count > 0)
                 {
                     rewardCosmetic = availableCosmetics[UnityEngine.Random.Range(0, availableCosmetics.Count)];

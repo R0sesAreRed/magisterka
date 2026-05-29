@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
   m_Name: DefaultBG
   m_EditorClassIdentifier: 
-  id: 6
+  id: 4
   itemName: "Podstawowe t\u0142o"
   type: 0
   CurrencyCost: 0
   SetNumber: 0
   font: {fileID: 0}
   sprite: {fileID: -5789391156787896902, guid: fc7d1ef3219ef914c8d52ac433421c3e, type: 3}
+  tiled: 0
+  keySprites: []
   colorWhite: {r: 1, g: 1, b: 1, a: 0}
   colorBlack: {r: 1, g: 1, b: 1, a: 0}

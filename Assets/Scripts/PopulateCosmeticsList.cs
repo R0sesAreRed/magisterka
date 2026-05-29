@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -32,6 +33,7 @@ public class PopulateCosmeticsList : MonoBehaviour
             CosmeticsEvents.SaveCosmetics?.Invoke();
             CosmeticsEvents.LoadCosmetics?.Invoke();
             RefreshList();
+            Debug.Log("Purchase made");
         }
     }
 
@@ -48,6 +50,7 @@ public class PopulateCosmeticsList : MonoBehaviour
     private void Equip(CosmeticsData data)
     {
         var existingIndex = GameManager.instance.playerEquippedCosmetics.FindIndex(c => c.type == data.type);
+        Debug.Log("Swapping Item at intex" + existingIndex);
         if (existingIndex >= 0)
             GameManager.instance.playerEquippedCosmetics[existingIndex] = data;
         else
@@ -55,11 +58,13 @@ public class PopulateCosmeticsList : MonoBehaviour
         CosmeticsEvents.SaveEquipped?.Invoke();
         CosmeticsEvents.LoadEquipped?.Invoke();
         RefreshList();
+        Debug.Log("Equipped");
     }
     void Start()
     {
         RefreshList();
-
+        Debug.Log("startpopulate");
+        Debug.Log("playercosmetics count: " + GameManager.instance.playerCosmetics.Count);
     }
     void Update()
     {
@@ -68,19 +73,24 @@ public class PopulateCosmeticsList : MonoBehaviour
 
     public void RefreshList()
     {
+        bool showFontCosmetics = GameManager.instance.pointsOn || GameManager.instance.hitQualityOn;
+
         if(shop)
         {
             foreach (Transform child in ContentPanel.transform)
             {
                 Destroy(child.gameObject);
             }
-            var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Contains(c));
+            var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c =>
+                (!GameManager.instance.playerCosmetics.Exists(p => p.id == c.id)) &&
+                (showFontCosmetics || c.type != CosmeticType.Font));
+            
             foreach (var item in availableCosmetics)
             {
                 var go = Instantiate(CosmeticItemPrefab, ContentPanel.transform);
                 go.GetComponent<CosmeticItemView>().Initialize(item, this, shop);
             }
-            currency.text = GameManager.instance.currency.ToString();
+            currency.text = GameManager.instance.currency.ToString() + "$";
         }
         else
         {
@@ -88,10 +98,31 @@ public class PopulateCosmeticsList : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
-            foreach (var item in GameManager.instance.playerCosmetics)
+            var equipped = GameManager.instance.playerEquippedCosmetics;
+            var owned = GameManager.instance.playerCosmetics;
+            HashSet<int> spawnedIds = new HashSet<int>();
+            foreach (var item in equipped)
             {
-                var go = Instantiate(CosmeticItemPrefab, ContentPanel.transform);
-                go.GetComponent<CosmeticItemView>().Initialize(item, this, shop);
+                if (owned.Exists(c => c.id == item.id) && (showFontCosmetics || item.type != CosmeticType.Font))
+                {
+                    var go = Instantiate(CosmeticItemPrefab, ContentPanel.transform);
+                    go.GetComponent<CosmeticItemView>().Initialize(item, this, shop);
+
+                    // Zmie� kolor na czerwony
+                    var image = go.GetComponent<Image>();
+                    if (image != null)
+                        image.color = Color.red;
+
+                    spawnedIds.Add(item.id);
+                }
+            }
+            foreach (var item in owned)
+            {
+                if (!spawnedIds.Contains(item.id) && (showFontCosmetics || item.type != CosmeticType.Font))
+                {
+                    var go = Instantiate(CosmeticItemPrefab, ContentPanel.transform);
+                    go.GetComponent<CosmeticItemView>().Initialize(item, this, shop);
+                }
             }
         }
     }

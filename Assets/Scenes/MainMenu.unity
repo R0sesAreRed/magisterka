@@ -8629,14 +8629,26 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bace629f4b948d44681b53f8d03ad37c, type: 2}
   playerCurrentQuests: []
   allCosmetics:
-  - {fileID: 11400000, guid: 1ad2a2d5719610b4c8bd5299b75fef5b, type: 2}
-  - {fileID: 11400000, guid: 4073c6b0d4fffbc4ab7e436688aa4989, type: 2}
-  - {fileID: 11400000, guid: ad88612b97fa4a04aa44b73f89f8bbe9, type: 2}
+  - {fileID: 11400000, guid: 6ecf3bd2507a9c74b9cc23f3280bbcf6, type: 2}
   - {fileID: 11400000, guid: 90882900b87cbc249bcf2e279e7f8f02, type: 2}
-  - {fileID: 11400000, guid: 62ba1268dc82a5141a8abf1174dbcea4, type: 2}
+  - {fileID: 11400000, guid: b92889126dd0203488af2aa553194728, type: 2}
+  - {fileID: 11400000, guid: 80c425a4ce802d349a276e841d752c70, type: 2}
   - {fileID: 11400000, guid: 705cfaeabac05fd44818a819d664ddef, type: 2}
+  - {fileID: 11400000, guid: 1ad2a2d5719610b4c8bd5299b75fef5b, type: 2}
   - {fileID: 11400000, guid: 5ffd5c6aac96dda4a9d1002a5a877aff, type: 2}
   - {fileID: 11400000, guid: f70e0cb5a0d407b429a7df3d04964d4d, type: 2}
+  - {fileID: 11400000, guid: 49f85bd08ea48d74f97e96632bb2b08e, type: 2}
+  - {fileID: 11400000, guid: 4073c6b0d4fffbc4ab7e436688aa4989, type: 2}
+  - {fileID: 11400000, guid: ee12e4e0da998034faf06a5eee2c1d80, type: 2}
+  - {fileID: 11400000, guid: 374af1c8b040004468a3249a2406e8ea, type: 2}
+  - {fileID: 11400000, guid: e6444ce687cdcea4cb4bc7d42f5a5825, type: 2}
+  - {fileID: 11400000, guid: 62ba1268dc82a5141a8abf1174dbcea4, type: 2}
+  - {fileID: 11400000, guid: a3f8316ae4aa4c64cb3da10c6b9ef29f, type: 2}
+  - {fileID: 11400000, guid: f875494b729101d449682fb4f2458de0, type: 2}
+  - {fileID: 11400000, guid: fc7677e75192585428070818330e6dea, type: 2}
+  - {fileID: 11400000, guid: ad88612b97fa4a04aa44b73f89f8bbe9, type: 2}
+  - {fileID: 11400000, guid: f6b21014b1bf5ca43b031fdc908a383c, type: 2}
+  - {fileID: 11400000, guid: feb7df017c6e2d34ab5ffe2e63ea3913, type: 2}
   playerCosmetics:
   - {fileID: 11400000, guid: 1ad2a2d5719610b4c8bd5299b75fef5b, type: 2}
   - {fileID: 11400000, guid: 705cfaeabac05fd44818a819d664ddef, type: 2}
@@ -8770,6 +8782,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   AllCosmetics: []
+  defaultEquippedCosmetics:
+  - {fileID: 11400000, guid: 705cfaeabac05fd44818a819d664ddef, type: 2}
+  - {fileID: 11400000, guid: 1ad2a2d5719610b4c8bd5299b75fef5b, type: 2}
+  - {fileID: 11400000, guid: 5ffd5c6aac96dda4a9d1002a5a877aff, type: 2}
+  - {fileID: 11400000, guid: f70e0cb5a0d407b429a7df3d04964d4d, type: 2}
+  defaultPlayerCosmetics:
+  - {fileID: 11400000, guid: 705cfaeabac05fd44818a819d664ddef, type: 2}
+  - {fileID: 11400000, guid: 1ad2a2d5719610b4c8bd5299b75fef5b, type: 2}
+  - {fileID: 11400000, guid: 5ffd5c6aac96dda4a9d1002a5a877aff, type: 2}
+  - {fileID: 11400000, guid: f70e0cb5a0d407b429a7df3d04964d4d, type: 2}
 --- !u!114 &1909634716
 MonoBehaviour:
   m_ObjectHideFlags: 0

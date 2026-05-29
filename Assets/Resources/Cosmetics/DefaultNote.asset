@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
   m_Name: DefaultNote
   m_EditorClassIdentifier: 
-  id: 5
+  id: 7
   itemName: Podstawowy bloczek
   type: 1
   CurrencyCost: 0
   SetNumber: 0
   font: {fileID: 0}
   sprite: {fileID: -5485750295247698565, guid: d19d56611b6c69b44af0f81eec1680eb, type: 3}
+  tiled: 0
+  keySprites: []
   colorWhite: {r: 1, g: 1, b: 1, a: 0}
   colorBlack: {r: 1, g: 1, b: 1, a: 0}

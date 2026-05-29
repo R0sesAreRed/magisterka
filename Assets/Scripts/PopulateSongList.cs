@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PopulateSongList : MonoBehaviour
 {
@@ -64,6 +65,35 @@ public class PopulateSongList : MonoBehaviour
                         var sepText = child0.GetComponent<TMPro.TextMeshProUGUI>();
                         if (sepText != null)
                             sepText.text = $"Poziom: {currentLevel}";
+                    }
+                    if(GameManager.instance.progressBarOn)
+                    {
+                        var progressBarRoot = sep.transform.GetChild(1).gameObject;
+                        bool showProgressBar = currentLevel > 0;
+                        progressBarRoot.SetActive(showProgressBar);
+
+                        if (showProgressBar)
+                        {
+                            int prevLevel = currentLevel - 1;
+                            var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
+                            float progress = 0f;
+
+                            if (prevSongs.Count > 0)
+                            {
+                                if (!GameManager.instance.pointsOn)
+                                {
+                                    int completedCount = prevSongs.Count(s => s.Completed);
+                                    progress = (float)completedCount / prevSongs.Count;
+                                }
+                                else
+                                {
+                                    double sumScores = prevSongs.Sum(s => s.BestScore);
+                                    progress = (float)(sumScores / (prevSongs.Count * 50.0));
+                                }
+                            }
+
+                            sep.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = Mathf.Clamp01(progress); //here
+                        }
                     }
                 }
             }

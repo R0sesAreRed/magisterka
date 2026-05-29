@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
   m_Name: RainbowFont
   m_EditorClassIdentifier: 
-  id: 3
+  id: 13
   itemName: "Czcionka T\u0119cza"
   type: 3
   CurrencyCost: 700
   SetNumber: 3
   font: {fileID: 11400000, guid: 625e002b993516842a87cbbd9635714b, type: 2}
-  sprite: {fileID: 0}
+  sprite: {fileID: -8810921606384794192, guid: 69a963695f98bd84ebeb6da23b23fe31, type: 3}
+  tiled: 0
+  keySprites: []
   colorWhite: {r: 0, g: 0, b: 0, a: 0}
   colorBlack: {r: 0, g: 0, b: 0, a: 0}

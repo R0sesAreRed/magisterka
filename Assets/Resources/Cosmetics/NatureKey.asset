@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
+  m_Name: NatureKey
+  m_EditorClassIdentifier: 
+  id: 10
+  itemName: Klawisze Natura
+  type: 2
+  CurrencyCost: 1500
+  SetNumber: 4
+  font: {fileID: 0}
+  sprite: {fileID: 6601039854345150035, guid: f1f6bebecb1d82a41a5158fc82abd30a, type: 3}
+  tiled: 0
+  keySprites:
+  - {fileID: 7822469799972601191, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -1014839103, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -997706026, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: 1648904583, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: 1425559090, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: 1065038338, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -126915411, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: 1169027361, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -1551382128, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -701740254, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: 123288178, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: 615049829, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -663298109, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -487008566, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  - {fileID: -1164794407, guid: 96f0343010d83b94189728275abc774a, type: 3}
+  colorWhite: {r: 0, g: 0, b: 0, a: 0}
+  colorBlack: {r: 0, g: 0, b: 0, a: 0}

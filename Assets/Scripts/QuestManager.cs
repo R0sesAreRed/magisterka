@@ -24,7 +24,7 @@ public class QuestManager : MonoBehaviour
     }
 
 
-    public void Save(List<QuestData> items) //to trzeba dodaæ w miejscach ktore tego potrzebuja
+    public void Save(List<QuestData> items) //to trzeba dodaï¿½ w miejscach ktore tego potrzebuja
     {
         QuestsDatabase db = new QuestsDatabase();
 
@@ -71,7 +71,7 @@ public class QuestManager : MonoBehaviour
             QuestData randomQuest = allQuests[UnityEngine.Random.Range(0, allQuests.Count)];
             if (!GameManager.instance.playerCurrentQuests.Exists(q => q.id == randomQuest.id))
             {
-                // Stwórz kopiê ScriptableObject
+                // Stwï¿½rz kopiï¿½ ScriptableObject
                 QuestData questCopy = ScriptableObject.CreateInstance<QuestData>();
                 questCopy.id = randomQuest.id;
                 questCopy.description = randomQuest.description;
@@ -80,7 +80,7 @@ public class QuestManager : MonoBehaviour
                 questCopy.currentValue = 0;
                 questCopy.OneLevel = randomQuest.OneLevel;
                 questCopy.rewardCurrency = randomQuest.rewardCurrency;
-                var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Contains(c));
+                var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Exists(p => p.id == c.id));
                 if (availableCosmetics.Count > 0)
                 {
                     questCopy.altReward = availableCosmetics[UnityEngine.Random.Range(0, availableCosmetics.Count)];
@@ -187,15 +187,15 @@ public static class QuestEvents
 // rozegraj 2 melodii                                               //melodie +
 // rozegraj 5 melodii                                               //melodie +
 // rozegraj 10 melodii                                              //melodie +
-// przejdŸ melodiê z 100% trafieñ                                   //100hits +
-// w trakcie jednej melodii traf 5 perfekcyjnych trafieñ            //perfecthits +
-// w trakcie jednej melodii traf 10 perfekcyjnych trafieñ           //pefrecthits +
-// w trakcie jednej melodii traf 15 perfekcyjnych trafieñ           //perfecthits +
-// w trakcie jednej melodii osi¹gnij 60% maksymalnego wyniku        //score +
-// zdob¹dŸ osi¹gniêcie                                              //achievement
-// ukoñcz melodiê                                                   //melodiefinish +
-// ukoñcz 3 melodie                                                 //melodiefinish +
-// ukoñcz 5 melodii                                                 //melodiefinish +
+// przejdï¿½ melodiï¿½ z 100% trafieï¿½                                   //100hits +
+// w trakcie jednej melodii traf 5 perfekcyjnych trafieï¿½            //perfecthits +
+// w trakcie jednej melodii traf 10 perfekcyjnych trafieï¿½           //pefrecthits +
+// w trakcie jednej melodii traf 15 perfekcyjnych trafieï¿½           //perfecthits +
+// w trakcie jednej melodii osiï¿½gnij 60% maksymalnego wyniku        //score +
+// zdobï¿½dï¿½ osiï¿½gniï¿½cie                                              //achievement
+// ukoï¿½cz melodiï¿½                                                   //melodiefinish +
+// ukoï¿½cz 3 melodie                                                 //melodiefinish +
+// ukoï¿½cz 5 melodii                                                 //melodiefinish +
 
 
 public class QuestsDatabase

@@ -15,25 +15,20 @@ public class CosmeticItemView : MonoBehaviour
             var SelectButton = GetComponent<UnityEngine.UI.Button>();
             SelectButton.onClick.RemoveAllListeners();
             SelectButton.onClick.AddListener(() => popcsom.OpenPurchaseMenu(item));
-
+            cosmdata = item;
             transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = item.itemName;
-            transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = Types[item.type];
-            transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = Sets[item.SetNumber];
-            transform.GetChild(3).GetComponent<TMPro.TextMeshProUGUI>().text = item.CurrencyCost.ToString();
-            transform.GetChild(4).GetComponent<Image>().sprite = item.sprite;
-            transform.GetChild(4).GetComponent<Image>().color = item.colorWhite;
+            transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = item.CurrencyCost.ToString() + "$";
+            transform.GetChild(2).GetComponent<Image>().sprite = item.sprite;
         }
         else
         {
             var SelectButton = GetComponent<UnityEngine.UI.Button>();
             SelectButton.onClick.RemoveAllListeners();
+            SelectButton.onClick.AddListener(() => popcsom.OpenCollectionMenu(item));
             cosmdata = item;
             transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = item.itemName;
-            transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = Types[item.type];
-            transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = Sets[item.SetNumber];
-            transform.GetChild(3).gameObject.SetActive(false);
-            transform.GetChild(4).GetComponent<Image>().sprite = item.sprite;
-            transform.GetChild(4).GetComponent<Image>().color = item.colorWhite;
+            transform.GetChild(1).gameObject.SetActive(false);
+            transform.GetChild(2).GetComponent<Image>().sprite = item.sprite;
         }
     }
 

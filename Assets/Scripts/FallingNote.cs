@@ -1,5 +1,6 @@
 using System.Drawing;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class FallingNote : MonoBehaviour
 {
@@ -14,6 +15,9 @@ public class FallingNote : MonoBehaviour
         noteLength = (float)len / 1000f;
         fallSpeed = KeyboardManager.instance.ScreenHeight / 2f;
         this.spawnY = spawnY;
+        CosmeticsData noteskin = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.NoteSkin);
+        this.GetComponent<Image>().sprite = noteskin.sprite;
+        this.GetComponent<Image>().type = noteskin.tiled? Image.Type.Tiled : Image.Type.Sliced;
     }
 
 

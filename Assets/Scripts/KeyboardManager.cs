@@ -55,7 +55,24 @@ public class KeyboardManager : MonoBehaviour
             //KeyColliders[(GameManager.NK)i] = Keys[i].GetComponentInChildren<BoxCollider2D>();
             KeyVisualsDict[(GameManager.NK)i] = Keys[i].transform.GetChild(0).gameObject;
             keyDefaultColors[(GameManager.NK)i] = KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().color;
-            //Debug.Log(KeyVisualsDict[(GameManager.NK)i]);
+            string enumName = ((GameManager.NK)i).ToString();
+            bool isWhiteKey = !enumName.Contains("S");
+            if (isWhiteKey)
+            {
+                var keySkin = GameManager.instance.GetEquippedKeySkin();
+                if (keySkin != null && keySkin.keySprites != null)
+                {
+                    // Compute white-key index (number of white keys before this index)
+                    int whiteIndex = 0;
+                    for (int j = 0; j < i; j++)
+                    {
+                        if (!((GameManager.NK)j).ToString().Contains("S"))
+                            whiteIndex++;
+                    }
+                    if (whiteIndex >= 0 && whiteIndex < keySkin.keySprites.Length)
+                        KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().sprite = keySkin.keySprites[whiteIndex];
+                }
+            }
             var detector = Keys[i].GetComponent<KeyCollisionDetector>();
             if (detector != null)
             {

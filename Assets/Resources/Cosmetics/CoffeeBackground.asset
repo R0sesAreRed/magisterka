@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
+  m_Name: CoffeeBackground
+  m_EditorClassIdentifier: 
+  id: 0
+  itemName: "T\u0142o Kawa"
+  type: 0
+  CurrencyCost: 1800
+  SetNumber: 1
+  font: {fileID: 0}
+  sprite: {fileID: -2250551204921605616, guid: 36542fdc2328ea648a807f4f72b15642, type: 3}
+  tiled: 0
+  keySprites: []
+  colorWhite: {r: 0, g: 0, b: 0, a: 0}
+  colorBlack: {r: 0, g: 0, b: 0, a: 0}

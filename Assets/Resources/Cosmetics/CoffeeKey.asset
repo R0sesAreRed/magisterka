@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
+  m_Name: CoffeeKey
+  m_EditorClassIdentifier: 
+  id: 2
+  itemName: Klawisze Kawa
+  type: 2
+  CurrencyCost: 0
+  SetNumber: 1
+  font: {fileID: 0}
+  sprite: {fileID: 6340639329951915335, guid: 81cb8072ca5116149a7eddbaa30d11bb, type: 3}
+  tiled: 0
+  keySprites:
+  - {fileID: -1898920737767428764, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: 411431881, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: 971767417, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: 1512733637, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: 594984885, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -345319151, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -429403920, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: 736684873, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -604269479, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -1645400145, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -1542882941, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -584173858, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -1176051865, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -617315444, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  - {fileID: -2136011554, guid: ee650c37e99895a4fb0a49aca156fbc9, type: 3}
+  colorWhite: {r: 0, g: 0, b: 0, a: 0}
+  colorBlack: {r: 0, g: 0, b: 0, a: 0}

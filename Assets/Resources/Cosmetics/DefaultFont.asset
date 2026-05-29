@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
   m_Name: DefaultFont
   m_EditorClassIdentifier: 
-  id: 0
+  id: 5
   itemName: Podstawowa czcionka
   type: 3
   CurrencyCost: 0
   SetNumber: 0
   font: {fileID: 11400000, guid: 0c444d5e3f12a744f8993c1742bee95a, type: 2}
-  sprite: {fileID: 0}
+  sprite: {fileID: -8810921606384794192, guid: 6bf1712d248e6374cb8324f7a5b0cd77, type: 3}
+  tiled: 0
+  keySprites: []
   colorWhite: {r: 0, g: 0, b: 0, a: 0}
   colorBlack: {r: 0, g: 0, b: 0, a: 0}

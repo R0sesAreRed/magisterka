@@ -12,12 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20cc68c551e65242817d2d85349796a, type: 3}
   m_Name: NatureFont
   m_EditorClassIdentifier: 
-  id: 4
+  id: 9
   itemName: Czcionka Natura
   type: 3
   CurrencyCost: 700
   SetNumber: 4
   font: {fileID: 11400000, guid: 7afb94e7bac44bb438757eb957404d39, type: 2}
-  sprite: {fileID: 0}
+  sprite: {fileID: -6683966257321344725, guid: 8d4a123d7f45be848a0e1d07b6e09f86, type: 3}
+  tiled: 0
+  keySprites: []
   colorWhite: {r: 0, g: 0, b: 0, a: 0}
   colorBlack: {r: 0, g: 0, b: 0, a: 0}
