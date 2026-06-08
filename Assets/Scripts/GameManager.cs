@@ -55,7 +55,16 @@ public class GameManager : MonoBehaviour
         }
     }
     public bool tutorialCompleted = false;
+    public bool verification = false;
+    public bool singleSongVerifying = false;
+    public int visibleNotes = 0;
     public int currency = 0;
+    public double BPMmod = 1.0;
+    public void verify()
+    {
+        Debug.Log("Verification started");
+        verification = true;
+    }
 
     public string GetPersistSettingsName()
     {

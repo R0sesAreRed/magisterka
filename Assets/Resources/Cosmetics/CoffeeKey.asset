@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 2
   itemName: Klawisze Kawa
   type: 2
-  CurrencyCost: 0
+  CurrencyCost: 1200
   SetNumber: 1
   font: {fileID: 0}
   sprite: {fileID: 6340639329951915335, guid: 81cb8072ca5116149a7eddbaa30d11bb, type: 3}

@@ -1,46 +1,48 @@
     using UnityEngine;
+using UnityEngine.UI;
 
 public class SelectSongItemView : MonoBehaviour
 {
     public SelectSongItem songData;
     private PopulateSongList songList;
     private SongSaveSystem saveSystem;
+    private bool ToggleOn = false;
     public void Initialize(SelectSongItem item, PopulateSongList list, SongSaveSystem save)
     {
         songData = item;
         songList = list;
         saveSystem = save;
         var SelectButton = GetComponent<UnityEngine.UI.Button>();
-        SelectButton.onClick.RemoveAllListeners();
-        SelectButton.onClick.AddListener(SelectSong);
 
         transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = item.Title;
         transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Najlepszy wynik: {item.BestScore:F1}%";
-        if (GameManager.instance.levelsOn)
-            transform.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Poziom: {item.Level}";
-        else
-            transform.transform.GetChild(2).gameObject.SetActive(false);
-        transform.GetChild(3).gameObject.SetActive(item.added);
-        var deleteButton = transform.GetChild(3).GetComponent<UnityEngine.UI.Button>();
-        deleteButton.onClick.RemoveAllListeners();
-        deleteButton.onClick.AddListener(DeleteSong);
+        transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Poziom trudnoÅ›ci: {item.Level}";
+        transform.GetChild(3).gameObject.SetActive(songData.added);
     }
 
     public void DeleteSong()
     {
-        // Usuñ z listy importowanych plików
+        // Usuï¿½ z listy importowanych plikï¿½w
         GameManager.instance.importedFiles.Remove(songData);
 
-        // Zapisz zmienion¹ listê do pliku JSON
+        // Zapisz zmienionï¿½ listï¿½ do pliku JSON
         saveSystem.Save(GameManager.instance.importedFiles);
 
-        // Odœwie¿ listê w UI
+        // Odï¿½wieï¿½ listï¿½ w UI
         songList.RefreshList();
     }
+
 
     public void SelectSong()
     {
         GameManager.instance.currentSong = songData;
+        SelectsongUIManager.instance.GameModeSelection.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"{GameManager.instance.currentSong.Title}";
+        SelectsongUIManager.instance.GameModeSelection.transform.GetChild(3).GetComponent<Button>().interactable =
+        GameManager.instance.currentSong.Completed && (GameManager.instance.currentSong.BestScore >= 75.0 || !GameManager.instance.pointsOn);
+
+        GameManager.instance.BPMmod = 1.0;
+        SelectsongUIManager.instance.GameModeSelection.SetActive(true);
+        
         Debug.Log($"Selected song: {GameManager.instance.currentSong.FilePath}");
         songList.RefreshList();
     }

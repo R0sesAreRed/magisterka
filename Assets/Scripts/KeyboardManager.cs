@@ -55,22 +55,25 @@ public class KeyboardManager : MonoBehaviour
             //KeyColliders[(GameManager.NK)i] = Keys[i].GetComponentInChildren<BoxCollider2D>();
             KeyVisualsDict[(GameManager.NK)i] = Keys[i].transform.GetChild(0).gameObject;
             keyDefaultColors[(GameManager.NK)i] = KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().color;
-            string enumName = ((GameManager.NK)i).ToString();
-            bool isWhiteKey = !enumName.Contains("S");
-            if (isWhiteKey)
+            if (!GameManager.instance.verification)
             {
-                var keySkin = GameManager.instance.GetEquippedKeySkin();
-                if (keySkin != null && keySkin.keySprites != null)
+                string enumName = ((GameManager.NK)i).ToString();
+                bool isWhiteKey = !enumName.Contains("S");
+                if (isWhiteKey)
                 {
-                    // Compute white-key index (number of white keys before this index)
-                    int whiteIndex = 0;
-                    for (int j = 0; j < i; j++)
+                    var keySkin = GameManager.instance.GetEquippedKeySkin();
+                    if (keySkin != null && keySkin.keySprites != null)
                     {
-                        if (!((GameManager.NK)j).ToString().Contains("S"))
-                            whiteIndex++;
+                        // Compute white-key index (number of white keys before this index)
+                        int whiteIndex = 0;
+                        for (int j = 0; j < i; j++)
+                        {
+                            if (!((GameManager.NK)j).ToString().Contains("S"))
+                                whiteIndex++;
+                        }
+                        if (whiteIndex >= 0 && whiteIndex < keySkin.keySprites.Length)
+                            KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().sprite = keySkin.keySprites[whiteIndex];
                     }
-                    if (whiteIndex >= 0 && whiteIndex < keySkin.keySprites.Length)
-                        KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().sprite = keySkin.keySprites[whiteIndex];
                 }
             }
             var detector = Keys[i].GetComponent<KeyCollisionDetector>();
@@ -373,7 +376,10 @@ public class KeyboardManager : MonoBehaviour
                     long chordKey = (long)Math.Round(missedNotes[0].noteStartTime * 10000.0);
                     if (penalizedChordStarts.Add(chordKey))
                     {
+                        SetAllFallingNoteColorsToWhite();
                         GameUIManager.instance.HealthPoints -= 1000;
+                        GameUIManager.instance.audioSource.PlayOneShot(GameUIManager.instance.loseHP);
+  
                     }
 
                     // Usu� rozliczone nuty z kolejki
@@ -388,6 +394,66 @@ public class KeyboardManager : MonoBehaviour
             }
             lastCollisionTime.Remove(note);
         }
+    }
+
+    /// <summary>
+    /// Resets all keyboard state for game replay
+    /// </summary>
+    public void ResetGameState()
+    {
+        Debug.Log("[KeyboardManager] ResetGameState called");
+        
+        // Clear all note timing dictionaries
+        noteTimings.Clear();
+        penalizedChordStarts.Clear();
+        
+        // Reset key press states
+        isKeyPressed.Clear();
+        hasActiveCollision.Clear();
+        lastCollisionTime.Clear();
+        lastKeyPressTime.Clear();
+        activeNoteTimings.Clear();
+        
+        // Reset key colors to default
+        foreach (var note in System.Enum.GetValues(typeof(GameManager.NK)))
+        {
+            GameManager.NK noteKey = (GameManager.NK)note;
+            if (KeyVisualsDict.TryGetValue(noteKey, out var visual) && keyDefaultColors.TryGetValue(noteKey, out var defaultColor))
+            {
+                Image keyImage = visual.GetComponent<Image>();
+                if (keyImage != null)
+                {
+                    keyImage.color = defaultColor;
+                }
+            }
+        }
+        
+        // Reset note timings initialization flag so it rebuilds on next song
+        noteTimingsInitialized = false;
+        StartCoroutine(InitializeNoteTimingsWhenReady());
+        
+        Debug.Log("[KeyboardManager] ResetGameState completed");
+    }
+
+    /// <summary>
+    /// Finds every FallingNote in the scene and restores its Image color to opaque white.
+    /// </summary>
+    public void SetAllFallingNoteColorsToWhite()
+    {
+        FallingNote[] fallingNotes = FindObjectsByType<FallingNote>(FindObjectsSortMode.None);
+        foreach (FallingNote fallingNote in fallingNotes)
+        {
+            if (fallingNote == null)
+                continue;
+
+            Image noteImage = fallingNote.GetComponent<Image>();
+            if (noteImage != null)
+            {
+                noteImage.color = new Color(1f, 1f, 1f, 0.7f);
+            }
+        }
+
+        Debug.Log($"[KeyboardManager] Reset {fallingNotes.Length} FallingNote image colors to white.");
     }
 
 

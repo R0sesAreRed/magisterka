@@ -8,10 +8,11 @@ public class PopulateSongList : MonoBehaviour
     [SerializeField] private GameObject listParent;
     [SerializeField] private GameObject LevelSeparator;
     [SerializeField] private SongSaveSystem saveSystem = new SongSaveSystem();
-
+    public GameObject SelectGamemodeMenu;
     void Start()
     {
         // Wczytaj list� tylko raz na start
+        GameManager.instance.singleSongVerifying = false;
         GameManager.instance.importedFiles = saveSystem.Load();
         AddMissingSongsFromFolder();
         RefreshList();
@@ -37,6 +38,15 @@ public class PopulateSongList : MonoBehaviour
             saveSystem.Save(GameManager.instance.importedFiles);
         }
     }
+    public void setValuesForLearn()
+    {
+        GameManager.instance.singleSongVerifying = false;
+    }
+    public void SetValuesForVerification()
+    {
+        GameManager.instance.visibleNotes = 5;
+        GameManager.instance.singleSongVerifying = true;
+    }
 
     public void RefreshList()
     {
@@ -50,6 +60,8 @@ public class PopulateSongList : MonoBehaviour
 
         int minLevel = sorted.Min(x => x.Level);
         int currentLevel = int.MinValue;
+        bool tutorialActive = GameManager.instance != null && !GameManager.instance.tutorialCompleted;
+        bool firstTutorialSong = true;
 
         foreach (var item in sorted)
         {
@@ -66,34 +78,31 @@ public class PopulateSongList : MonoBehaviour
                         if (sepText != null)
                             sepText.text = $"Poziom: {currentLevel}";
                     }
-                    if(GameManager.instance.progressBarOn)
+                    var progressBarRoot = sep.transform.GetChild(1).gameObject;
+                    bool showProgressBar = GameManager.instance.progressBarOn && currentLevel > 0;
+                    progressBarRoot.SetActive(showProgressBar);
+
+                    if (showProgressBar)
                     {
-                        var progressBarRoot = sep.transform.GetChild(1).gameObject;
-                        bool showProgressBar = currentLevel > 0;
-                        progressBarRoot.SetActive(showProgressBar);
+                        int prevLevel = currentLevel - 1;
+                        var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
+                        float progress = 0f;
 
-                        if (showProgressBar)
+                        if (prevSongs.Count > 0)
                         {
-                            int prevLevel = currentLevel - 1;
-                            var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
-                            float progress = 0f;
-
-                            if (prevSongs.Count > 0)
+                            if (!GameManager.instance.pointsOn)
                             {
-                                if (!GameManager.instance.pointsOn)
-                                {
-                                    int completedCount = prevSongs.Count(s => s.Completed);
-                                    progress = (float)completedCount / prevSongs.Count;
-                                }
-                                else
-                                {
-                                    double sumScores = prevSongs.Sum(s => s.BestScore);
-                                    progress = (float)(sumScores / (prevSongs.Count * 50.0));
-                                }
+                                int completedCount = prevSongs.Count(s => s.Completed);
+                                progress = (float)completedCount / prevSongs.Count;
                             }
-
-                            sep.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = Mathf.Clamp01(progress); //here
+                            else
+                            {
+                                double sumScores = prevSongs.Sum(s => s.BestScore);
+                                progress = (float)(sumScores / (prevSongs.Count * 50.0));
+                            }
                         }
+
+                        sep.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = Mathf.Clamp01(progress); //here
                     }
                 }
             }
@@ -131,7 +140,25 @@ public class PopulateSongList : MonoBehaviour
             var btn = go.GetComponent<UnityEngine.UI.Button>();
             if (btn != null)
             {
-                btn.interactable = interactable;
+                if (tutorialActive)
+                {
+                    btn.interactable = firstTutorialSong;
+                    if (firstTutorialSong)
+                    {
+                        btn.onClick.AddListener(() =>
+                        {
+                            if (TutorialRoute.instance != null)
+                            {
+                                TutorialRoute.instance.nextStepByValue(16);
+                            }
+                        });
+                        firstTutorialSong = false;
+                    }
+                }
+                else
+                {
+                    btn.interactable = interactable;
+                }
             }
 
             go.GetComponent<SelectSongItemView>().Initialize(item, this, saveSystem);

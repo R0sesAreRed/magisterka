@@ -76,6 +76,7 @@
     <Compile Include="Assets\Scripts\SelectSongItemData.cs" />
     <Compile Include="Assets\Scripts\CosmeticsDataClass.cs" />
     <Compile Include="Assets\Scripts\SettingManager.cs" />
+    <Compile Include="Assets\Scripts\SelectsongUIManager.cs" />
     <Compile Include="Assets\Scripts\PopulateSongList.cs" />
     <Compile Include="Assets\Scripts\AchievementDataClass.cs" />
     <Compile Include="Assets\Scripts\KeyboardManager.cs" />
@@ -111,6 +112,7 @@
     <Compile Include="Assets\Scripts\QuestManager.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleSaveFileImage.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
+    <Compile Include="Assets\Scripts\BpmModToggleSetter.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\BasicSample.cs" />
     <Compile Include="Assets\Scripts\FileImporter.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleOpenFileImage.cs" />

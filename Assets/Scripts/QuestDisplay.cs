@@ -29,7 +29,7 @@ public class QuestDisplay : MonoBehaviour
     {
         transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = desc;
         transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"{currprog}/{goal}";
-        transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Nagroda: {altreward}$";
+        transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Nagroda: {altreward}";
         if (goal > 1 && GameManager.instance.progressBarOn)
             transform.GetChild(3).GetChild(0).GetComponent<Image>().fillAmount = (float)currprog / goal;
         else
@@ -46,7 +46,7 @@ public class QuestDisplay : MonoBehaviour
     {
         transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = desc;
         transform.GetChild(1).gameObject.SetActive(false);
-        transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Nagroda: {altreward}$";
+        transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Nagroda: {altreward}";
         transform.GetChild(3).gameObject.SetActive(false);
     }
 }

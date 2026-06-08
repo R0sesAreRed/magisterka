@@ -14,6 +14,7 @@ public class MidiReader : MonoBehaviour
     //public Dictionary<GameManager.NK, float> NotesPositionDict;
     public string midiPath;
     private bool midiInitialized;
+    private int midiLoadRequestId;
 
 
 
@@ -33,14 +34,19 @@ public class MidiReader : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(InitializeMidiWhenReady());
+        StartCoroutine(InitializeMidiWhenReady(midiLoadRequestId));
     }
 
-    private IEnumerator InitializeMidiWhenReady()
+    private IEnumerator InitializeMidiWhenReady(int requestId)
     {
         while (GameManager.instance == null || GameManager.instance.currentSong == null || DataCollection.instance == null)
         {
             yield return null;
+        }
+
+        if (requestId != midiLoadRequestId)
+        {
+            yield break;
         }
 
         if (midiInitialized)
@@ -51,7 +57,12 @@ public class MidiReader : MonoBehaviour
         midiPath = SetMidiPath(GameManager.instance.currentSong.FilePath);
         Debug.Log($"Midi path set to: {midiPath}");
 
-        var loadedNotes = ReadMidiNotes(midiPath);
+        var loadedNotes = ReadMidiNotes(midiPath, GameManager.instance.BPMmod);
+        if (requestId != midiLoadRequestId)
+        {
+            yield break;
+        }
+
         if (loadedNotes == null)
         {
             GameManager.instance.CurrMidiNotes = new List<GameManager.Notes>();
@@ -67,6 +78,16 @@ public class MidiReader : MonoBehaviour
         //{
         //    Debug.Log($"Note: {note.Note}, StartTime: {note.StartTime}, Length: {note.Length}");
         //}
+    }
+
+    /// <summary>
+    /// Resets internal MIDI initialization so a new currentSong can be loaded.
+    /// </summary>
+    public void ResetMidiForNewSong()
+    {
+        midiInitialized = false;
+        midiLoadRequestId++;
+        StartCoroutine(InitializeMidiWhenReady(midiLoadRequestId));
     }
 
     private List<GameManager.Notes> CleanUpMidi(List<GameManager.Notes> rawNotes) //MIDI NIE DZIA�A TO PEWNIE TUTAJ
@@ -137,11 +158,150 @@ public class MidiReader : MonoBehaviour
 
     private string SetMidiPath(string path) 
     {
-        var filePath = path; // GameManager.instance.inputActions.Piano.MidiPath.ReadValue<string>();
-        return filePath;
+        return ResolveMidiPath(path);
     }
 
-    public List<GameManager.Notes> ReadMidiNotes(string midiPath)
+    private string ResolveMidiPath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return path;
+        }
+
+        var normalizedPath = path.Replace('\\', '/');
+        var normalizedLower = normalizedPath.ToLowerInvariant();
+
+        var tried = new List<string>();
+
+        // 1) If path already exists on disk, use it.
+        tried.Add(path);
+        if (File.Exists(path))
+        {
+            Debug.Log($"ResolveMidiPath: found original path: {path}");
+            return path;
+        }
+
+        // 2) If path looks like an Asset path (case-insensitive), try StreamingAssets and dataPath using the relative part.
+        if (normalizedLower.StartsWith("assets/") || normalizedLower.Contains("/streamingassets/") || normalizedLower.StartsWith("streamingassets/"))
+        {
+            string relativePath;
+
+            if (normalizedLower.StartsWith("assets/"))
+                relativePath = normalizedPath.Substring("Assets/".Length);
+            else
+            {
+                // find streamingassets/ index and take the remainder
+                int idx = normalizedLower.IndexOf("streamingassets/");
+                if (idx >= 0)
+                    relativePath = normalizedPath.Substring(idx + "streamingassets/".Length);
+                else
+                    relativePath = normalizedPath;
+            }
+
+            // If relativePath still starts with StreamingAssets/, strip it to avoid duplication when combining
+            if (relativePath.StartsWith("StreamingAssets/", System.StringComparison.OrdinalIgnoreCase))
+            {
+                relativePath = relativePath.Substring("StreamingAssets/".Length);
+            }
+
+            string streamingAssetsCandidate = Path.Combine(Application.streamingAssetsPath, relativePath);
+            tried.Add(streamingAssetsCandidate);
+            if (File.Exists(streamingAssetsCandidate))
+            {
+                Debug.Log($"ResolveMidiPath: found in StreamingAssets: {streamingAssetsCandidate}");
+                return streamingAssetsCandidate;
+            }
+
+            string dataPathCandidate = Path.Combine(Application.dataPath, relativePath);
+            tried.Add(dataPathCandidate);
+            if (File.Exists(dataPathCandidate))
+            {
+                Debug.Log($"ResolveMidiPath: found in dataPath: {dataPathCandidate}");
+                return dataPathCandidate;
+            }
+
+            // Also check Resources under Assets/Resources
+            var resourcesIndex = normalizedLower.IndexOf("resources/");
+            if (resourcesIndex >= 0)
+            {
+                string resourceRelative = normalizedPath.Substring(resourcesIndex + "resources/".Length);
+                string resourcePathNoExt = Path.ChangeExtension(resourceRelative, null).Replace('/', Path.DirectorySeparatorChar).Replace('\\', '/');
+                tried.Add($"Resources:{resourcePathNoExt}");
+                var ta = Resources.Load<TextAsset>(resourcePathNoExt);
+                if (ta != null)
+                {
+                    // write to persistent and return
+                    string outPath = Path.Combine(Application.persistentDataPath, Path.GetFileName(resourceRelative));
+                    File.WriteAllBytes(outPath, ta.bytes);
+                    Debug.Log($"ResolveMidiPath: extracted TextAsset from Resources to: {outPath}");
+                    return outPath;
+                }
+            }
+        }
+
+        // 3) Try appending the provided path to StreamingAssets and data paths in case stored path was relative.
+        string streamingCandidate2 = Path.Combine(Application.streamingAssetsPath, normalizedPath);
+        tried.Add(streamingCandidate2);
+        if (File.Exists(streamingCandidate2))
+        {
+            Debug.Log($"ResolveMidiPath: found in StreamingAssets (alt): {streamingCandidate2}");
+            return streamingCandidate2;
+        }
+
+        string dataCandidate2 = Path.Combine(Application.dataPath, normalizedPath);
+        tried.Add(dataCandidate2);
+        if (File.Exists(dataCandidate2))
+        {
+            Debug.Log($"ResolveMidiPath: found in dataPath (alt): {dataCandidate2}");
+            return dataCandidate2;
+        }
+
+        // 4) Check persistentDataPath by filename
+        string persistentCandidate = Path.Combine(Application.persistentDataPath, Path.GetFileName(path));
+        tried.Add(persistentCandidate);
+        if (File.Exists(persistentCandidate))
+        {
+            Debug.Log($"ResolveMidiPath: found in persistentDataPath: {persistentCandidate}");
+            return persistentCandidate;
+        }
+
+        // 5) Fallback: search StreamingAssets recursively for the same filename (helps when folder structure differs)
+        try
+        {
+            string filename = Path.GetFileName(path);
+            if (!string.IsNullOrEmpty(filename) && Directory.Exists(Application.streamingAssetsPath))
+            {
+                var matches = Directory.GetFiles(Application.streamingAssetsPath, filename, System.IO.SearchOption.AllDirectories);
+                if (matches != null && matches.Length > 0)
+                {
+                    tried.Add(matches[0]);
+                    Debug.Log($"ResolveMidiPath: found by filename search in StreamingAssets: {matches[0]}");
+                    return matches[0];
+                }
+            }
+
+            // Also search persistentDataPath
+            if (!string.IsNullOrEmpty(filename) && Directory.Exists(Application.persistentDataPath))
+            {
+                var pmatches = Directory.GetFiles(Application.persistentDataPath, filename, System.IO.SearchOption.AllDirectories);
+                if (pmatches != null && pmatches.Length > 0)
+                {
+                    tried.Add(pmatches[0]);
+                    Debug.Log($"ResolveMidiPath: found by filename search in persistentDataPath: {pmatches[0]}");
+                    return pmatches[0];
+                }
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"ResolveMidiPath: error during filename search fallback: {ex.Message}");
+        }
+
+        Debug.LogWarning($"ResolveMidiPath: could not resolve path '{path}'. Tried: {string.Join(", ", tried)}");
+        return path;
+    }
+
+    public List<GameManager.Notes> ReadMidiNotes(string midiPath, double BPMmult = 1.0)
     {
         var notesList = new List<GameManager.Notes>();
         const int c3Number = 36;
@@ -236,6 +396,9 @@ public class MidiReader : MonoBehaviour
                 // Przelicz czas na milisekundy
                 double start = (double)TimeConverter.ConvertTo<MetricTimeSpan>(note.Time, tempoMap).TotalMilliseconds + 3000.0;
                 double length = (double)LengthConverter.ConvertTo<MetricTimeSpan>(note.Length, note.Time, tempoMap).TotalMilliseconds;
+
+                start /= BPMmult;
+                length /= BPMmult;
 
                 notesList.Add(new GameManager.Notes
                 {

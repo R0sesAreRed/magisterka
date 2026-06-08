@@ -31,8 +31,11 @@ public class TutorialPopup : MonoBehaviour
     }
     public void nextStep(GameObject GO)
     {
-        GO.SetActive(true);
-        TutorialRoute.instance.currentTutorialStep++;
+        if(!GameManager.instance.tutorialCompleted)
+        {
+            GO.SetActive(true);
+            TutorialRoute.instance.currentTutorialStep++;
+        }
     }
     public void completeTutorial()
     {
@@ -64,6 +67,10 @@ public class TutorialPopup : MonoBehaviour
         yield return new WaitForSeconds(4.5f);
         Debug.Log("Activating next popup after delay");
         GO.SetActive(true);
+        TutorialRoute.instance.currentTutorialStep++;
+    }
+    public void incrementStep()
+    {
         TutorialRoute.instance.currentTutorialStep++;
     }
 }

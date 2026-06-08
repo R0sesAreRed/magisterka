@@ -42,10 +42,29 @@ public class FileImporter : MonoBehaviour
 
                 var item = ScriptableObject.CreateInstance<SelectSongItem>();
 
-                item.Title = Path.GetFileNameWithoutExtension(selectedPath);
-                item.FilePath = selectedPath;
+                // Copy imported file into a runtime-safe folder so the app can access it across sessions
+                string importDir = Path.Combine(Application.persistentDataPath, "ImportedMidis");
+                if (!Directory.Exists(importDir))
+                {
+                    Directory.CreateDirectory(importDir);
+                }
+
+                string destPath = Path.Combine(importDir, Path.GetFileName(selectedPath));
+                try
+                {
+                    File.Copy(selectedPath, destPath, true);
+                    Debug.Log($"Imported MIDI copied to: {destPath}");
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"Failed to copy imported MIDI: {ex.Message}. Falling back to original path.");
+                    destPath = selectedPath;
+                }
+
+                item.Title = Path.GetFileNameWithoutExtension(destPath);
+                item.FilePath = destPath;
                 item.BestScore = 0;
-                item.Level = 0; //TODO: zrobiæ ¿eby level by³ liczony na podstawie trudnoœci piosenki
+                item.Level = 0; //TODO: zrobiï¿½ ï¿½eby level byï¿½ liczony na podstawie trudnoï¿½ci piosenki
                 item.added = true;
 
                 GameManager.instance.importedFiles.Add(item);

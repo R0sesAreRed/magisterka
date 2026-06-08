@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 18
   itemName: Klawisze Vice
   type: 2
-  CurrencyCost: 0
+  CurrencyCost: 1500
   SetNumber: 2
   font: {fileID: 0}
   sprite: {fileID: 6340639329951915335, guid: edf3fdda581383841994bb5e4d505363, type: 3}

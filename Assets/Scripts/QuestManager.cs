@@ -45,7 +45,8 @@ public class QuestManager : MonoBehaviour
 
         if (!File.Exists(path))
         {
-            DrawNewQuests();
+            if(GameManager.instance.tutorialCompleted)
+                DrawNewQuests();
             return GameManager.instance.playerCurrentQuests;
         }
             

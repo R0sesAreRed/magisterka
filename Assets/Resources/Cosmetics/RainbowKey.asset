@@ -15,7 +15,7 @@ MonoBehaviour:
   id: 14
   itemName: "Klawisze T\u0119cza"
   type: 2
-  CurrencyCost: 0
+  CurrencyCost: 1200
   SetNumber: 3
   font: {fileID: 0}
   sprite: {fileID: 6340639329951915335, guid: 234b98e907c40084ca2d5b6cc1997630, type: 3}

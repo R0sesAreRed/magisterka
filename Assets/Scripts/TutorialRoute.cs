@@ -18,4 +18,19 @@ public class TutorialRoute : MonoBehaviour
         }
         Object.DontDestroyOnLoad(gameObject);
     }
+
+    public void nextStepByValue(int step)
+    {
+        var allPopups = GameObject.FindObjectsByType<TutorialPopup>(FindObjectsSortMode.None);
+        foreach (var popup in allPopups)
+        {
+            if (popup.myStep == step)
+            {
+                GameObject foundObject = popup.gameObject;
+                foundObject.SetActive(true);
+                Debug.Log("Znaleziono obiekt: " + foundObject.name);
+                break;
+            }
+        }
+    }
 }

@@ -25,16 +25,10 @@
 +	skiny
 +	wyświetlanie powiadomień o osiągnięciach i zadaniach
 
-
-opis ustawień 90/10 -> paski postępu
-paski postępu na levelach, questach i achievementach
 tryb weryfikacji
 ankietka
 ukraść odpowiednie midi
 rozwinąć przetwarzanie midi może?
-
-punkty
-paski postępu
 
 
 1:352943496378:web:d30e7de07a06a576e87683 app id

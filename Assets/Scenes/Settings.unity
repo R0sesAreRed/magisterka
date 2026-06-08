@@ -2793,7 +2793,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Description: "Wy\u015Bwietla paski post\u0119pu w r\xF3\u017Cnych cz\u0119\u015Bciach
     aplikacji"
-  Icon: {fileID: 0}
+  Icon: {fileID: 1155130556757487387, guid: 101ec2aa087815f40a0abc1c9fceeea9, type: 3}
   DescriptionPanel: {fileID: 2001314985}
 --- !u!1 &884459682
 GameObject:
@@ -3126,7 +3126,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 0}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -4077,8 +4077,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Po najechaniu na jedno z ustawie\u0144 w tym miejscu wy\u015Bwietli si\u0119
-    jego opis. Po opuszczeniu tego menu edycja ustawie\u0144 (opr\xF3cz g\u0142o\u015Bno\u015Bci)
+  m_text: "Po najechaniu na jedno z ustawie\u0144, w tym miejscu wy\u015Bwietli si\u0119
+    jego opis. Po opuszczeniu tego menu, edycja ustawie\u0144 (opr\xF3cz g\u0142o\u015Bno\u015Bci)
     zostanie zablokowana."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

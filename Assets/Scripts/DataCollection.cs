@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Threading.Tasks;
 using Firebase;
@@ -49,6 +50,7 @@ public class DataCollection : MonoBehaviour
         public string SelectedAccount;
         public string SongTitle;
         public double BestScore;
+        public double BPMmod;
         public int TotalNotes;
         public int MissedNotes;
         public int OkNotes;
@@ -60,6 +62,7 @@ public class DataCollection : MonoBehaviour
         public string SubmitionTime;
         public int AttemptCount;
         public string LastError;
+        public bool SingleSongVerification;
     }
 
     [Serializable]
@@ -198,6 +201,7 @@ public class DataCollection : MonoBehaviour
             SelectedAccount = GameManager.instance != null ? GameManager.instance.SelectedAccount : string.Empty,
             SongTitle = currentSong != null ? currentSong.Title : string.Empty,
             BestScore = currentSong != null ? currentSong.BestScore : 0d,
+            BPMmod = GameManager.instance != null ? GameManager.instance.BPMmod : 1d,
             TotalNotes = TotalNotes,
             MissedNotes = MissedNotes,
             OkNotes = OkNotes,
@@ -209,6 +213,8 @@ public class DataCollection : MonoBehaviour
             SubmitionTime = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
             AttemptCount = 0,
             LastError = string.Empty
+            ,
+            SingleSongVerification = GameManager.instance != null ? GameManager.instance.singleSongVerifying || GameManager.instance.verification : false
         };
     }
 
@@ -282,6 +288,7 @@ public class DataCollection : MonoBehaviour
             { "SelectedAccount", record.SelectedAccount },
             { "SongTitle", record.SongTitle },
             { "BestScore", record.BestScore },
+            { "BPMmod", record.BPMmod },
             { "TotalNotes", record.TotalNotes },
             { "MissedNotes", record.MissedNotes },
             { "OkNotes", record.OkNotes },
@@ -290,6 +297,7 @@ public class DataCollection : MonoBehaviour
             { "TotalTimePlayed", record.TotalTimePlayed },
             { "LevelSuccess", record.LevelSuccess },
             { "SettingsString", record.SettingsString },
+            { "SingleSongVerification", record.SingleSongVerification },
             { "SubmitionTime", record.SubmitionTime },
             { "AttemptCount", record.AttemptCount }
         };
@@ -428,6 +436,103 @@ public class DataCollection : MonoBehaviour
         GoodNotes = 0;
         PerfectNotes = 0;
         LevelSuccess = false;
+    }
+
+    /// <summary>
+    /// Returns top N song titles that the specified account completed (LevelSuccess==true), ordered by number of successful attempts (desc).
+    /// Falls back to an empty list on error or if Firebase isn't ready.
+    /// </summary>
+    public async Task<List<string>> GetTopSuccessfulSongsAsync(string accountName, int topN)
+    {
+        var result = new List<string>();
+        if (!firebaseReady || firestore == null)
+        {
+            Debug.LogWarning("[DataCollection] Firebase not ready - cannot query top successful songs.");
+            return result;
+        }
+
+        if (string.IsNullOrEmpty(accountName))
+        {
+            Debug.LogWarning("[DataCollection] Account name empty - cannot query top successful songs.");
+            return result;
+        }
+
+        try
+        {
+            var counts = new Dictionary<string, int>();
+            Query query = firestore.Collection(firestoreCollectionName)
+                .WhereEqualTo("SelectedAccount", accountName)
+                .WhereEqualTo("LevelSuccess", true);
+
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+            foreach (DocumentSnapshot doc in snapshot.Documents)
+            {
+                if (doc.TryGetValue<string>("SongTitle", out var title))
+                {
+                    if (string.IsNullOrEmpty(title))
+                        continue;
+                    if (!counts.ContainsKey(title))
+                        counts[title] = 0;
+                    counts[title]++;
+                }
+            }
+
+            result = counts.OrderByDescending(kv => kv.Value).Take(topN).Select(kv => kv.Key).ToList();
+            return result;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[DataCollection] Error querying top successful songs: {ex}");
+            return result;
+        }
+    }
+
+    public async Task<double> GetMostFrequentBPMmodAsync(string accountName, string songTitle, double fallbackBpmmod = 1d)
+    {
+        if (!firebaseReady || firestore == null)
+        {
+            Debug.LogWarning("[DataCollection] Firebase not ready - cannot query BPMmod history.");
+            return fallbackBpmmod;
+        }
+
+        if (string.IsNullOrEmpty(accountName) || string.IsNullOrEmpty(songTitle))
+        {
+            return fallbackBpmmod;
+        }
+
+        try
+        {
+            var counts = new Dictionary<double, int>();
+            Query query = firestore.Collection(firestoreCollectionName)
+                .WhereEqualTo("SelectedAccount", accountName)
+                .WhereEqualTo("SongTitle", songTitle);
+
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+            foreach (DocumentSnapshot doc in snapshot.Documents)
+            {
+                if (doc.TryGetValue<double>("BPMmod", out var bpmmod))
+                {
+                    if (!counts.ContainsKey(bpmmod))
+                    {
+                        counts[bpmmod] = 0;
+                    }
+
+                    counts[bpmmod]++;
+                }
+            }
+
+            if (counts.Count == 0)
+            {
+                return fallbackBpmmod;
+            }
+
+            return counts.OrderByDescending(kv => kv.Value).ThenBy(kv => kv.Key).First().Key;
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"[DataCollection] Error querying BPMmod history: {ex}");
+            return fallbackBpmmod;
+        }
     }
 
 }

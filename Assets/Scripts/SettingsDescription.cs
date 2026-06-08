@@ -14,7 +14,7 @@ public class SettingsDescription : MonoBehaviour, IPointerEnterHandler, IPointer
         Debug.Log("Mouse is over the settings item." + gameObject.name);
         DescriptionPanel.SetActive(true);
         DescriptionPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = Description;
-        // DescriptionPanel.transform.GetChild(1).GetComponent<Image>().sprite = Icon;
+        DescriptionPanel.transform.GetChild(1).GetComponent<Image>().sprite = Icon;
     }
 
     public void OnPointerExit(PointerEventData eventData)

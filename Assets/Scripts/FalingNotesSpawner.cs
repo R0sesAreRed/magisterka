@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class FalingNotesSpawner : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class FalingNotesSpawner : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("[FalingNotesSpawner] songStartTime set to " + GameManager.instance.songStartTime);
         notesParent = this.transform;
         if (GameManager.instance != null)
         {
@@ -31,12 +33,12 @@ public class FalingNotesSpawner : MonoBehaviour
         }
     }
 
-    private IEnumerator Start() //UI zajmuje troche czasu u³ozenie sie po pocz¹tku sceny
+    private IEnumerator Start() //UI zajmuje troche czasu uï¿½ozenie sie po poczï¿½tku sceny
     {
         yield return null;
         
         XPositions.Clear();
-        int enumLength = System.Enum.GetValues(typeof(GameManager.NK)).Length; //zbiera pozycje x klawiszy z opoznieniem ¿eby ui mia³o czas sie u³o¿yæ
+        int enumLength = System.Enum.GetValues(typeof(GameManager.NK)).Length; //zbiera pozycje x klawiszy z opoznieniem ï¿½eby ui miaï¿½o czas sie uï¿½oï¿½yï¿½
 
         GameObject[] keysArray = keyboardManager.Keys;
         for (int i = 0; i < enumLength; i++)
@@ -98,21 +100,21 @@ public class FalingNotesSpawner : MonoBehaviour
         // 1. Oblicz czas trwania nuty w sekundach
         float noteDurationSec = (float)(noteData.Length / 1000.0);
 
-        // 2. Prêdkoœæ spadania (ScreenHeight / 2 na sekundê)
+        // 2. Prï¿½dkoï¿½ï¿½ spadania (ScreenHeight / 2 na sekundï¿½)
         float fallSpeed = KeyboardManager.instance.ScreenHeight / 2f;
 
-        // 3. Oblicz wysokoœæ nuty
+        // 3. Oblicz wysokoï¿½ï¿½ nuty
         float noteHeight = noteDurationSec * fallSpeed;
 
-        // 4. Pobierz szerokoœæ klawisza
+        // 4. Pobierz szerokoï¿½ï¿½ klawisza
         var keyRect = KeyboardManager.instance.KeyVisualsDict[noteData.Note]?.GetComponent<RectTransform>();
-        float noteWidth = keyRect != null ? keyRect.rect.width : 40f; // domyœlna szerokoœæ, jeœli brak
+        float noteWidth = keyRect != null ? keyRect.rect.width : 40f; // domyï¿½lna szerokoï¿½ï¿½, jeï¿½li brak
 
         Vector3 spawnPos = new Vector3(xPos, 1000, 0f);
 
-        // 6. Stwórz nutê
+        // 6. Stwï¿½rz nutï¿½
         GameObject noteObj = Instantiate(notePrefab, spawnPos, Quaternion.identity, notesParent);
-        //Debug.Log($"Spawnuje nutê: {noteData.Note} o czasie: {noteData.StartTime} is d³ugoœci : {noteData.Length}");
+        //Debug.Log($"Spawnuje nutï¿½: {noteData.Note} o czasie: {noteData.StartTime} is dï¿½ugoï¿½ci : {noteData.Length}");
         //StartCoroutine(LogWhenNoteShouldBePlayed(noteData));
         noteObj.name = $"{noteData.Note} {noteData.StartTime} {noteData.Length}";
         // 7. Ustaw rozmiar nuty
@@ -120,23 +122,31 @@ public class FalingNotesSpawner : MonoBehaviour
         if (noteRect != null)
             noteRect.sizeDelta = new Vector2(noteWidth, noteHeight);
 
-        // 8. Ustaw rozmiar kolidera (opcjonalnie, jeœli u¿ywasz BoxCollider2D)
+        // 8. Ustaw rozmiar kolidera (opcjonalnie, jeï¿½li uï¿½ywasz BoxCollider2D)
         var collider = noteObj.GetComponent<BoxCollider2D>();
         if (collider != null && noteRect != null)
             collider.size = new Vector2(noteRect.rect.width / 2f, noteRect.rect.height);
             collider.offset = new Vector2(0f, noteHeight / 2f);
 
-        // 9. Przeka¿ dane do prefabrykatu
+        // 9. Przekaï¿½ dane do prefabrykatu
         var fallingNote = noteObj.GetComponent<FallingNote>();
         if (fallingNote != null)
             fallingNote.Init(noteData.StartTime, noteData.Length, 0);
+
+        if((GameManager.instance.singleSongVerifying || GameManager.instance.verification))
+        {
+            float visibility = ((float)GameManager.instance.visibleNotes / 5.0f);
+            noteRect.GetComponent<Image>().color = new Color(1f, 1f, 1f, visibility);
+            Debug.Log("pozostaÅ‚o widocznych nut " + GameManager.instance.visibleNotes + " widocznoÅ›Ä‡ " + visibility);
+            GameManager.instance.visibleNotes--;
+        }
     }
     public IEnumerator LogWhenNoteShouldBePlayed(GameManager.Notes noteData)
     {
         yield return new WaitForSeconds(1.5f);
-        Debug.Log($"Nuta {noteData.Note} powinna byæ zagrana teraz!");
+        Debug.Log($"Nuta {noteData.Note} powinna byï¿½ zagrana teraz!");
         yield return new WaitForSeconds((float)noteData.Length/1000f);
-        Debug.Log($"Nuta {noteData.Note} powinna zostaæ wypuszczona teraz!");
+        Debug.Log($"Nuta {noteData.Note} powinna zostaï¿½ wypuszczona teraz!");
     }
 
     public void PauseResume(InputAction.CallbackContext ctx)
@@ -193,5 +203,35 @@ public class FalingNotesSpawner : MonoBehaviour
         Resume();
         yield return new WaitForSeconds(4.5f);
         Pause();
+    }
+
+    /// <summary>
+    /// Resets all spawned notes and spawner state for game replay
+    /// </summary>
+    public void ResetNotes()
+    {
+        Debug.Log("[FalingNotesSpawner] ResetNotes called");
+        
+        // Destroy all child note objects
+        if (notesParent != null)
+        {
+            foreach (Transform child in notesParent)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+        
+        // Reset spawner state
+        if (GameManager.instance != null)
+        {
+            GameManager.instance.songStartTime = Time.time;
+            GameManager.instance.nextNoteIndex = 0;
+            Debug.Log("[FalingNotesSpawner] songStartTime reset to " + GameManager.instance.songStartTime);
+        }
+        
+        // Reset pause time to current time
+        pauseTime = Time.time;
+        
+        Debug.Log("[FalingNotesSpawner] ResetNotes completed");
     }
 }

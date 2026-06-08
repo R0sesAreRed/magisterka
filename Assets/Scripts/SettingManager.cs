@@ -98,6 +98,8 @@ public class SettingManager : MonoBehaviour
         PlayerPrefs.SetString(GameManager.instance.GetPersistSettingsName(), GetSettingsString());
         PlayerPrefs.Save();
         AccountUtility.UpdateAccountVolume(GameManager.instance.volume);
+        if(!GameManager.instance.tutorialCompleted)
+            QuestEvents.DrawQuests.Invoke();
     }
 
     [ContextMenu("Randomize 3 Off (Balanced)")]

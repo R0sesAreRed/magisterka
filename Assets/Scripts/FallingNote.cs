@@ -9,15 +9,25 @@ public class FallingNote : MonoBehaviour
     private float fallSpeed;     // px/s
     private float spawnY;        // pozycja Y, z której nuta startuje
     private float destroyY = -4000f; //temporary
+    [SerializeField] public CosmeticsData defaultSkin;
     public void Init(double start, double len, float spawnY)
     {
         noteStartTime = (float)start / 1000f; // zamiana ms na s
         noteLength = (float)len / 1000f;
         fallSpeed = KeyboardManager.instance.ScreenHeight / 2f;
         this.spawnY = spawnY;
-        CosmeticsData noteskin = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.NoteSkin);
-        this.GetComponent<Image>().sprite = noteskin.sprite;
-        this.GetComponent<Image>().type = noteskin.tiled? Image.Type.Tiled : Image.Type.Sliced;
+        if (!GameManager.instance.verification)
+        {
+            CosmeticsData noteskin = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.NoteSkin);
+            this.GetComponent<Image>().sprite = noteskin.sprite;
+            this.GetComponent<Image>().type = noteskin.tiled? Image.Type.Tiled : Image.Type.Sliced;
+        }
+        else
+        {
+            this.GetComponent<Image>().sprite = defaultSkin.sprite;
+            this.GetComponent<Image>().type = defaultSkin.tiled ? Image.Type.Tiled : Image.Type.Sliced;
+        }
+
     }
 
 
