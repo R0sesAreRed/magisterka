@@ -1,0 +1,48 @@
+obecnie:
+9 mechanik/6 wybranych
+możliwość dostosowania zestawu
+dowolność w czasie rozgrywki
+weryfikacja na różnych melodiach (pomiędzy kontami)
+brak grupy kontrolnej
+
+
+zmiany:
+ograniczyć mechaniki do feedbackowych
+ --> tekst jakości trafienia
+ --> zbieranie punbktów
+ --> combo
+ --> podświetlanie kalwiszy/bloczków
+ --> granie wszystkich dźwięków/tylko poprawnych
+w pełni losowy wybór mechanik
+ograniczyć ilość melodii
+zbierać dane ze wszystkich klinięć, nie tylko z jakości poprawnych/nietrafionych
+standaryzacja czasu ćwiczeń konkretnej melodii przed weryfikacją
+grupa kontrolna (?)
+
+
+poszukać profesjonalnych arii do nauki
+jak zrobic grywalizację konkretnie pod muzykę
+wspominieć o kamerze do sprawdzania rąk w treści
+
+przebieg eksperymentu:
+?
+
+
+do zrobienia:
+- zmienic jak liczone sa punkty
+rework ustawień
++ obsługa per-key text feedback
+-> obsługa podświetlania nutek
+zastąpic serduszka combo
+głośność metronomu w ustawieniach i wgl wyczyścic ustawienia
++ dodac metronom
+rework zbierania statysyk
+opcja grania dźwieku tylko jak jest dobry
+
+rework weryfikacji
+zobaczyć jak trudno zrobić poprawny syntezator pianina
++ rework missowania nut <-- to na koniec
+rework wyglądu menu <---- to jeszcze bardziej na koniec
+
+
+

@@ -44,19 +44,19 @@ public class TutorialPopup : MonoBehaviour
         AccountUtility.UpdateAccountTutorialCompleted(true);
     }
 
-    public void nextStepSkipLevels(GameObject GO)
-    {
-        if (GameManager.instance.levelsOn)
-        {
-            GO.SetActive(true);
-            TutorialRoute.instance.currentTutorialStep++;
-        }
-        else
-        {
-            nextPopup.SetActive(true);
-            TutorialRoute.instance.currentTutorialStep += 2;
-        }
-    }
+    //public void nextStepSkipLevels(GameObject GO)
+    //{
+    //    if (GameManager.instance.levelsOn)
+    //    {
+    //        GO.SetActive(true);
+    //        TutorialRoute.instance.currentTutorialStep++;
+    //    }
+    //    else
+    //    {
+    //        nextPopup.SetActive(true);
+    //        TutorialRoute.instance.currentTutorialStep += 2;
+    //    }
+    //}
 
     public void nextStepAfterDelay(GameObject GO)
     {

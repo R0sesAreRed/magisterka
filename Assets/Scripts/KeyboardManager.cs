@@ -14,7 +14,7 @@ public class KeyboardManager : MonoBehaviour
 
     [SerializeField] public GameObject[] Keys; //tablica przechowuj�ca klawisze do przypi�cia
     public Dictionary<GameManager.NK, GameObject> KeysDict; //s�ownik mapuj�cy klawisze do nazw nut
-    //private Dictionary<GameManager.NK, BoxCollider2D> KeyColliders; //s�ownik mapuj�cy collidery klawiszy do nazw nut
+    private Dictionary<GameManager.NK, BoxCollider2D> KeyColliders; //s�ownik mapuj�cy collidery klawiszy do nazw nut
     public Dictionary<GameManager.NK, GameObject> KeyVisualsDict; //s�ownik trzymaj�cy wizualn� cz�� klawiszy
 
 
@@ -24,12 +24,15 @@ public class KeyboardManager : MonoBehaviour
     private Dictionary<GameManager.NK, float> lastKeyPressTime = new(); //s�ownik przechowuj�cy czas ostatniego naci�ni�cia klawisza dla ka�dej nuty
 
     private Dictionary<GameManager.NK, Queue<NoteTiming>> noteTimings = new();
-    private Dictionary<GameManager.NK, bool> isKeyPressed = new(); //track which keys are currently held down
-    private Dictionary<GameManager.NK, bool> hasActiveCollision = new(); //track which lanes have active collisions
+    public Dictionary<GameManager.NK, bool> isKeyPressed = new(); //track which keys are currently held down
+    public Dictionary<GameManager.NK, bool> hasActiveCollision = new(); //track which lanes have active collisions
     private Dictionary<GameManager.NK, Color> keyDefaultColors = new(); //store each key's original idle color
-    private HashSet<long> penalizedChordStarts = new(); //dedupe health penalty for the same chord across lanes
+    //private HashSet<long> penalizedChordStarts = new(); //dedupe health penalty for the same chord across lanes
 
     public float ScreenHeight = 0;
+
+    private ContactFilter2D contactFilter;
+
     private void Awake()
     {
         Debug.Log("KeyboardManager Awake: " + gameObject.name);
@@ -45,37 +48,17 @@ public class KeyboardManager : MonoBehaviour
         } //dok instancji
         ScreenHeight = this.GetComponent<RectTransform>().rect.height;
         KeysDict = new Dictionary<GameManager.NK, GameObject>();
-        //KeyColliders = new Dictionary<GameManager.NK, BoxCollider2D>();
+        KeyColliders = new Dictionary<GameManager.NK, BoxCollider2D>();
         KeyVisualsDict = new Dictionary<GameManager.NK, GameObject>();
 
         for (int i = 0; i < Keys.Length && i < Enum.GetValues(typeof(GameManager.NK)).Length; i++)
         {
             KeysDict[(GameManager.NK)i] = Keys[i];
             KeysDict[(GameManager.NK)i].name = ((GameManager.NK)i).ToString();
-            //KeyColliders[(GameManager.NK)i] = Keys[i].GetComponentInChildren<BoxCollider2D>();
+            KeyColliders[(GameManager.NK)i] = Keys[i].GetComponentInChildren<BoxCollider2D>();
             KeyVisualsDict[(GameManager.NK)i] = Keys[i].transform.GetChild(0).gameObject;
             keyDefaultColors[(GameManager.NK)i] = KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().color;
-            if (!GameManager.instance.verification)
-            {
-                string enumName = ((GameManager.NK)i).ToString();
-                bool isWhiteKey = !enumName.Contains("S");
-                if (isWhiteKey)
-                {
-                    var keySkin = GameManager.instance.GetEquippedKeySkin();
-                    if (keySkin != null && keySkin.keySprites != null)
-                    {
-                        // Compute white-key index (number of white keys before this index)
-                        int whiteIndex = 0;
-                        for (int j = 0; j < i; j++)
-                        {
-                            if (!((GameManager.NK)j).ToString().Contains("S"))
-                                whiteIndex++;
-                        }
-                        if (whiteIndex >= 0 && whiteIndex < keySkin.keySprites.Length)
-                            KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().sprite = keySkin.keySprites[whiteIndex];
-                    }
-                }
-            }
+            isKeyPressed[(GameManager.NK)i] = false;
             var detector = Keys[i].GetComponent<KeyCollisionDetector>();
             if (detector != null)
             {
@@ -83,7 +66,10 @@ public class KeyboardManager : MonoBehaviour
             }
         }
 
-
+        contactFilter = new ContactFilter2D
+        {
+            useTriggers = true
+        };
     }
 
     private bool noteTimingsInitialized = false;
@@ -112,7 +98,7 @@ public class KeyboardManager : MonoBehaviour
     private void BuildNoteTimings(List<GameManager.Notes> midiNotes)
     {
         noteTimings.Clear();
-        penalizedChordStarts.Clear();
+        //penalizedChordStarts.Clear();
 
         foreach (var noteData in midiNotes)
         {
@@ -184,10 +170,18 @@ public class KeyboardManager : MonoBehaviour
     }
     private void OnKeyPerformed(GameManager.NK note, InputAction.CallbackContext ctx)
     {
-        KeyPressColor(ctx, note);
+        KeyPressColor(ctx, note); //iskeypressed tez tutaj z jakiegos powodu
         lastKeyPressTime[note] = Time.time;
 
         double hitTime = GetCurrentSongTime();
+        Collider2D[] overlapResults = new Collider2D[3];
+        KeyColliders[note].Overlap(contactFilter, overlapResults);
+        if (overlapResults[0] != null)
+        {
+            Debug.Log(overlapResults.Length + " " + overlapResults[0].gameObject.name);
+            Debug.Log("Setting hit to true for note " + note);
+            overlapResults[0].gameObject.GetComponent<FallingNote>().hit = true;
+        }
         if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
         {
             var timing = FindActiveNote(queue, hitTime);
@@ -204,6 +198,16 @@ public class KeyboardManager : MonoBehaviour
         KeyReleaseColor(ctx, note);
 
         double releaseTime = GetCurrentSongTime();
+
+        Collider2D[] overlapResults = new Collider2D[3];
+        KeyColliders[note].Overlap(contactFilter, overlapResults);
+        if (overlapResults[0] != null)
+        {
+            Debug.Log(overlapResults.Length + " " + overlapResults[0].gameObject.name);
+            Debug.Log("Setting hit to true for note " + note);
+            overlapResults[0].gameObject.GetComponent<FallingNote>().hit = true;
+        }
+
         if (activeNoteTimings.TryGetValue(note, out var timing) && timing.hitTime.HasValue && !timing.scored)
         {
             timing.releaseTime = releaseTime;
@@ -315,32 +319,32 @@ public class KeyboardManager : MonoBehaviour
             }
         }
     }
-    private List<NoteTiming> FindMissedChordNotes(Queue<NoteTiming> queue, double currentTime)
-    {
-        List<NoteTiming> missedNotes = new List<NoteTiming>();
-        // Szukamy najwcze�niejszego niezaliczonego startu
-        double? earliestStart = null;
-        foreach (var timing in queue)
-        {
-            if (!timing.scored && timing.hitTime == null && currentTime > timing.noteStartTime + timing.noteLength)
-            {
-                if (earliestStart == null || timing.noteStartTime < earliestStart)
-                    earliestStart = timing.noteStartTime;
-            }
-        }
-        if (earliestStart == null)
-            return missedNotes;
+    //private List<NoteTiming> FindMissedChordNotes(Queue<NoteTiming> queue, double currentTime)
+    //{
+    //    List<NoteTiming> missedNotes = new List<NoteTiming>();
+    //    // Szukamy najwcze�niejszego niezaliczonego startu
+    //    double? earliestStart = null;
+    //    foreach (var timing in queue)
+    //    {
+    //        if (!timing.scored && timing.hitTime == null && currentTime > timing.noteStartTime + timing.noteLength)
+    //        {
+    //            if (earliestStart == null || timing.noteStartTime < earliestStart)
+    //                earliestStart = timing.noteStartTime;
+    //        }
+    //    }
+    //    if (earliestStart == null)
+    //        return missedNotes;
 
-        // Zbieramy wszystkie nuty z tym samym startem
-        foreach (var timing in queue)
-        {
-            if (!timing.scored && timing.hitTime == null && Math.Abs(timing.noteStartTime - earliestStart.Value) < 0.0001)
-            {
-                missedNotes.Add(timing);
-            }
-        }
-        return missedNotes;
-    }
+    //    // Zbieramy wszystkie nuty z tym samym startem
+    //    foreach (var timing in queue)
+    //    {
+    //        if (!timing.scored && timing.hitTime == null && Math.Abs(timing.noteStartTime - earliestStart.Value) < 0.0001)
+    //        {
+    //            missedNotes.Add(timing);
+    //        }
+    //    }
+    //    return missedNotes;
+    //}
 
     public void CheckMissedNote(GameManager.NK note, float exitTime)
     {
@@ -348,50 +352,50 @@ public class KeyboardManager : MonoBehaviour
         {
             hasActiveCollision[note] = false;
             UpdateKeyColor(note);
+            //if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
+            //{
+            //    double missCheckTime = exitTime - GameManager.instance.songStartTime;
+            //    var missedNotes = FindMissedChordNotes(queue, missCheckTime);
 
-            if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
-            {
-                double missCheckTime = exitTime - GameManager.instance.songStartTime;
-                var missedNotes = FindMissedChordNotes(queue, missCheckTime);
+            //    // Je�li s� nuty do rozliczenia
+            //    if (missedNotes.Count > 0)
+            //    {
+            //        // Rozlicz miss tylko raz dla akordu
+            //        Debug.Log("Missed chord or note at time: " + missedNotes[0].noteStartTime);
 
-                // Je�li s� nuty do rozliczenia
-                if (missedNotes.Count > 0)
-                {
-                    // Rozlicz miss tylko raz dla akordu
-                    Debug.Log("Missed chord or note at time: " + missedNotes[0].noteStartTime);
+            //        foreach (var timing in missedNotes)
+            //        {
+            //            int score = GameUIManager.instance.CalculateScore(
+            //                double.NaN,
+            //                timing.noteStartTime,
+            //                double.NaN,
+            //                timing.noteLength,
+            //                note
+            //            );
+            //            GameUIManager.instance.Score += score;
+            //            timing.scored = true;
+            //        }
 
-                    foreach (var timing in missedNotes)
-                    {
-                        int score = GameUIManager.instance.CalculateScore(
-                            double.NaN,
-                            timing.noteStartTime,
-                            double.NaN,
-                            timing.noteLength,
-                            note
-                        );
-                        GameUIManager.instance.Score += score;
-                        timing.scored = true;
-                    }
+            //        long chordKey = (long)Math.Round(missedNotes[0].noteStartTime * 10000.0);
+            //        if (penalizedChordStarts.Add(chordKey))
+            //        {
+            //            if (GameManager.instance.singleSongVerifying)
+            //                SetAllFallingNoteColorsToWhite();
+            //            GameUIManager.instance.HealthPoints -= 1000;
+            //            GameUIManager.instance.audioSource.PlayOneShot(GameUIManager.instance.loseHP);
 
-                    long chordKey = (long)Math.Round(missedNotes[0].noteStartTime * 10000.0);
-                    if (penalizedChordStarts.Add(chordKey))
-                    {
-                        SetAllFallingNoteColorsToWhite();
-                        GameUIManager.instance.HealthPoints -= 1000;
-                        GameUIManager.instance.audioSource.PlayOneShot(GameUIManager.instance.loseHP);
-  
-                    }
+            //        }
 
-                    // Usu� rozliczone nuty z kolejki
-                    var arr = queue.ToArray();
-                    queue.Clear();
-                    foreach (var t in arr)
-                    {
-                        if (!missedNotes.Contains(t))
-                            queue.Enqueue(t);
-                    }
-                }
-            }
+            //        // Usu� rozliczone nuty z kolejki
+            //        var arr = queue.ToArray();
+            //        queue.Clear();
+            //        foreach (var t in arr)
+            //        {
+            //            if (!missedNotes.Contains(t))
+            //                queue.Enqueue(t);
+            //        }
+            //    }
+            //}
             lastCollisionTime.Remove(note);
         }
     }
@@ -405,12 +409,12 @@ public class KeyboardManager : MonoBehaviour
         
         // Clear all note timing dictionaries
         noteTimings.Clear();
-        penalizedChordStarts.Clear();
+        //penalizedChordStarts.Clear();
         
         // Reset key press states
-        isKeyPressed.Clear();
+        //isKeyPressed.Clear();
         hasActiveCollision.Clear();
-        lastCollisionTime.Clear();
+        //lastCollisionTime.Clear();
         lastKeyPressTime.Clear();
         activeNoteTimings.Clear();
         

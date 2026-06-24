@@ -9,6 +9,8 @@ public class SelectSongItemData
     public int Level;
     public bool Completed;
     public bool added;
+    public string LevelSettings;
+    public float LevelTimePlayed;
 
     public SelectSongItemData(SelectSongItem item)
     {
@@ -18,6 +20,8 @@ public class SelectSongItemData
         Level = item.Level;
         Completed = item.Completed;
         added = item.added;
+        LevelSettings = item.LevelSettings;
+        LevelTimePlayed = item.LevelTimePlayed;
     }
 
     public SelectSongItem ToScriptableObject()
@@ -29,6 +33,8 @@ public class SelectSongItemData
         item.Level = Level;
         item.Completed = Completed;
         item.added = added;
+        item.LevelSettings = LevelSettings;
+        item.LevelTimePlayed = LevelTimePlayed;
         return item;
     }
 }

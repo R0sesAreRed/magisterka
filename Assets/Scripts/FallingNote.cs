@@ -1,33 +1,27 @@
 using System.Drawing;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
 
 public class FallingNote : MonoBehaviour
 {
-    private float noteStartTime; // w sekundach od startu utworu
-    private float noteLength;    // w sekundach
+    public GameManager.NK myNote;
+    public float noteStartTime; // w sekundach od startu utworu
+    public float noteLength;    // w sekundach
     private float fallSpeed;     // px/s
     private float spawnY;        // pozycja Y, z której nuta startuje
     private float destroyY = -4000f; //temporary
-    [SerializeField] public CosmeticsData defaultSkin;
-    public void Init(double start, double len, float spawnY)
+
+    private BoxCollider2D noteCollider;
+    public bool hit = false;
+    public bool chordHandler = true;
+    public void Init(GameManager.NK note, double start, double len, float spawnY)
     {
-        noteStartTime = (float)start / 1000f; // zamiana ms na s
+        myNote = note;
+        noteStartTime = (float)start / 1000f;
         noteLength = (float)len / 1000f;
         fallSpeed = KeyboardManager.instance.ScreenHeight / 2f;
         this.spawnY = spawnY;
-        if (!GameManager.instance.verification)
-        {
-            CosmeticsData noteskin = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.NoteSkin);
-            this.GetComponent<Image>().sprite = noteskin.sprite;
-            this.GetComponent<Image>().type = noteskin.tiled? Image.Type.Tiled : Image.Type.Sliced;
-        }
-        else
-        {
-            this.GetComponent<Image>().sprite = defaultSkin.sprite;
-            this.GetComponent<Image>().type = defaultSkin.tiled ? Image.Type.Tiled : Image.Type.Sliced;
-        }
-
     }
 
 
@@ -47,5 +41,45 @@ public class FallingNote : MonoBehaviour
         //float noteHeight = noteLength * fallSpeed;
         if (newY < destroyY) //zmienic to na cos co ma sens
             Destroy(gameObject);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if(KeyboardManager.instance.isKeyPressed[myNote] == true)
+        {
+            Debug.Log("Setting hit to true for note " + myNote);
+            hit = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        Debug.Log("Exiting trigger. hit: " + hit + " chordHandler: " + chordHandler);
+        if (KeyboardManager.instance.isKeyPressed[myNote] == true)
+        {
+            Debug.Log("Setting hit to true for note " + myNote);
+            hit = true;
+        }
+        else if(!hit)
+        {
+            foreach(var note in FindObjectsByType<FallingNote>(FindObjectsSortMode.None).Where(note => note.myNote != myNote))
+            {
+                if ((note.noteStartTime == noteStartTime || note.noteStartTime+note.noteLength == noteStartTime + noteLength) && chordHandler)
+                {
+                    Debug.Log("Setting chordHandler to true for note " + myNote);
+                    note.chordHandler = false;
+                }
+
+            }
+            if(chordHandler)
+            {
+                GameUIManager.instance.HealthPoints -= 1000;
+                GameUIManager.instance.audioSource.PlayOneShot(GameUIManager.instance.loseHP);
+                if (GameManager.instance.singleSongVerifying)
+                       KeyboardManager.instance.SetAllFallingNoteColorsToWhite();
+                //combo tutaj ig 
+            }
+
+        }
     }
 }

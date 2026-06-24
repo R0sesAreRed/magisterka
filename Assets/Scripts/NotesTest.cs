@@ -90,7 +90,13 @@ public class NotesTest : MonoBehaviour
 
     private void OnNotePerformed(GameManager.NK note, InputAction.CallbackContext ctx) //rozpoczyna granie nuty przy wciœniêciu klawisza do przypiêcia
     {
-        PlayNote(ctx, note, noteFreq[note]);
+        if(true) //setting od rodzaju graia nut
+        {
+            if (KeyboardManager.instance.hasActiveCollision[note])
+                PlayNote(ctx, note, noteFreq[note]);
+        }
+        else
+            PlayNote(ctx, note, noteFreq[note]);
     }
     private void OnNoteCanceled(GameManager.NK note, InputAction.CallbackContext ctx) //zatrzymuje gran¹ nutê przy wypuszczeniu klawisza do przypiêcia
     {

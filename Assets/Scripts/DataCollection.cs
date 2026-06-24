@@ -401,16 +401,17 @@ public class DataCollection : MonoBehaviour
         {
             return "111111111";
         }
+        return "00000000";
 
-        return (gm.pointsOn ? "1" : "0") +
-            (gm.progressBarOn ? "1" : "0") +
-            (gm.hitQualityOn ? "1" : "0") +
-            (gm.achievementsOn ? "1" : "0") +
-            (gm.shopAndCurrencyOn ? "1" : "0") +
-            (gm.rewardsAndCosmeticOn ? "1" : "0") +
-            (gm.questsOn ? "1" : "0") +
-            (gm.leaderBoardOn ? "1" : "0") +
-            (gm.levelsOn ? "1" : "0");
+        //return (gm.pointsOn ? "1" : "0") +
+        //    (gm.progressBarOn ? "1" : "0") +
+        //    (gm.hitQualityOn ? "1" : "0") +
+        //    (gm.achievementsOn ? "1" : "0") +
+        //    (gm.shopAndCurrencyOn ? "1" : "0") +
+        //    (gm.rewardsAndCosmeticOn ? "1" : "0") +
+        //    (gm.questsOn ? "1" : "0") +
+        //    (gm.leaderBoardOn ? "1" : "0") +
+        //    (gm.levelsOn ? "1" : "0");
     }
 
     private string SanitizeDocumentId(string value)

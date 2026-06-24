@@ -131,7 +131,7 @@ public class FalingNotesSpawner : MonoBehaviour
         // 9. Przeka� dane do prefabrykatu
         var fallingNote = noteObj.GetComponent<FallingNote>();
         if (fallingNote != null)
-            fallingNote.Init(noteData.StartTime, noteData.Length, 0);
+            fallingNote.Init(noteData.Note, noteData.StartTime, noteData.Length, 0);
 
         if((GameManager.instance.singleSongVerifying || GameManager.instance.verification))
         {
@@ -157,12 +157,14 @@ public class FalingNotesSpawner : MonoBehaviour
             float pausedDuration = Time.time - pauseTime;
             GameManager.instance.songStartTime += pausedDuration;
             GameManager.instance.IsPaused = false;
+            Metronome.instance.ResumeMetronome();
             GameUIManager.instance.TurnOffPauseMenu();
         }
         else
         {
             pauseTime = Time.time;
             GameManager.instance.IsPaused = true;
+            Metronome.instance.StopMetronome();
             GameUIManager.instance.TurnOnPauseMenu();
         }
     }
@@ -170,6 +172,7 @@ public class FalingNotesSpawner : MonoBehaviour
     public void PauseEndLevel()
     {
         pauseTime = Time.time;
+        Metronome.instance.StopMetronome();
         GameManager.instance.IsPaused = true;
         //Debug.Log("Paused");
     }
@@ -179,6 +182,7 @@ public class FalingNotesSpawner : MonoBehaviour
         float pausedDuration = Time.time - pauseTime;
         GameManager.instance.songStartTime += pausedDuration;
         GameManager.instance.IsPaused = false;
+        Metronome.instance.ResumeMetronome();
         GameUIManager.instance.TurnOffPauseMenu();
         //Debug.Log("unPaused");
     }
@@ -186,10 +190,12 @@ public class FalingNotesSpawner : MonoBehaviour
     public void Pause()
     {
         pauseTime = Time.time;
+        Metronome.instance.StopMetronome();
         GameManager.instance.IsPaused = true;
     }
     public void Upause()
     {
+        Metronome.instance.ResumeMetronome();
         GameManager.instance.IsPaused = false;
     }
 
@@ -205,9 +211,6 @@ public class FalingNotesSpawner : MonoBehaviour
         Pause();
     }
 
-    /// <summary>
-    /// Resets all spawned notes and spawner state for game replay
-    /// </summary>
     public void ResetNotes()
     {
         Debug.Log("[FalingNotesSpawner] ResetNotes called");

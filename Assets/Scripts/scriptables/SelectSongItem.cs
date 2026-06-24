@@ -10,5 +10,7 @@ public class SelectSongItem : ScriptableObject
     public int Level;
     public bool Completed;
     public bool added = false;
+    public string LevelSettings = "00000000"; //9  
+    public float LevelTimePlayed = 0;
 }
 

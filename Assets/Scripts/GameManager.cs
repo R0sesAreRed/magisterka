@@ -17,11 +17,6 @@ public class GameManager : MonoBehaviour
     public bool IsPaused = false;
 
     public List<SelectSongItem> importedFiles = new List<SelectSongItem>();
-    public List<AchievementData> playerAchievements = new List<AchievementData>();
-    public List<QuestData> playerCurrentQuests = new List<QuestData>();
-    public List<CosmeticsData> allCosmetics = new List<CosmeticsData>();
-    public List<CosmeticsData> playerCosmetics = new List<CosmeticsData>();
-    public List<CosmeticsData> playerEquippedCosmetics = new List<CosmeticsData>();
     [SerializeField] private SongSaveSystem saveSystem;
     [SerializeField] private AudioMixer audiomixer;
     public SelectSongItem currentSong;
@@ -33,18 +28,13 @@ public class GameManager : MonoBehaviour
 
     public int completedQuests = 0;
 
-    public bool levelsOn;
     public bool pointsOn; //+
     public bool progressBarOn; //+
     public bool hitQualityOn; //+
-    public bool achievementsOn; //+
-    public bool shopAndCurrencyOn; //+
-    public bool rewardsAndCosmeticOn; //+
-    public bool questsOn; //+
-    public bool leaderBoardOn;
 
     private float Volume;
 
+    public int CurrSongBPM;
     public float volume
     {
         get { return Volume; }
@@ -77,12 +67,6 @@ public class GameManager : MonoBehaviour
         pointsOn = settingsString[0] == '1';
         progressBarOn = settingsString[1] == '1';
         hitQualityOn = settingsString[2] == '1';
-        achievementsOn = settingsString[3] == '1';
-        shopAndCurrencyOn = settingsString[4] == '1';
-        rewardsAndCosmeticOn = settingsString[5] == '1';
-        questsOn = settingsString[6] == '1';
-        leaderBoardOn = settingsString[7] == '1';
-        levelsOn = settingsString[8] == '1';
     }
 
     [SerializeField] MainMenuUIMAnager MMUIM;
@@ -104,7 +88,6 @@ public class GameManager : MonoBehaviour
     {
         string settingsString = PlayerPrefs.GetString(GetPersistSettingsName(), "111111111");
         ParseSettingsString(settingsString);
-        MMUIM.DisableButtons();
     }
 
     //[SerializeField] TextMeshProUGUI scoreText;
@@ -120,21 +103,6 @@ public class GameManager : MonoBehaviour
     //        scoreText.text = "Score: " + score.ToString();
     //    }
     //}
-    public CosmeticsData GetEquippedKeySkin()
-    {
-        var keySkin = playerEquippedCosmetics.Find(c => c.type == CosmeticType.KeySkin);
-        if (keySkin != null)
-        {
-            // Zwróć lub zastosuj keySkin
-            Debug.Log("Equipped Key Skin: " + keySkin.itemName);
-            return keySkin;
-        }
-        else
-        {
-            Debug.Log("No Key Skin equipped.");
-            return null;
-        }
-    }
 
     public List<Notes> CurrMidiNotes;
     public enum NK { C3, CS3, D3, DS3, E3, F3, FS3, G3, GS3, A3, AS3, B3, C4, CS4, D4, DS4, E4, F4, FS4, G4, GS4, A4, AS4, B4, C5 } //enum z nazwami nut

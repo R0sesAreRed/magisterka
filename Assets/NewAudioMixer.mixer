@@ -49,12 +49,15 @@ AudioMixerController:
   m_EnableSuspend: 1
   m_UpdateMode: 0
   m_ExposedParameters:
+  - guid: 01e631f7b9779d642b96662c11b8ef3c
+    name: metronomVol
   - guid: fc7e643062bcd11419b7e53826876c85
     name: vol
   m_AudioMixerGroupViews:
   - guids:
     - 8202a88f5ce7b4143b7e0b78d2aa84e4
     - 66e2dffe55d14934b9c00b005145e853
+    - 9b47922df82460a48a50303e24b33c62
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -69,6 +72,7 @@ AudioMixerGroupController:
   m_GroupID: 8202a88f5ce7b4143b7e0b78d2aa84e4
   m_Children:
   - {fileID: -4660919535400883400}
+  - {fileID: 5312420843097100249}
   m_Volume: 58e4f47953aacc34ba1c8e5319f3594b
   m_Pitch: c930be3e4e9cdb444b3a985fbe33e781
   m_Send: 00000000000000000000000000000000
@@ -104,3 +108,36 @@ AudioMixerSnapshotController:
   m_FloatValues:
     fc7e643062bcd11419b7e53826876c85: 0
   m_TransitionOverrides: {}
+--- !u!243 &5312420843097100249
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Metronom
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 9b47922df82460a48a50303e24b33c62
+  m_Children: []
+  m_Volume: 01e631f7b9779d642b96662c11b8ef3c
+  m_Pitch: 3ce2a9b335040194abd0421b1cd365e2
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: 8194789756203160373}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &8194789756203160373
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: 68a4132d80081394f9221c84ef617f1f
+  m_EffectName: Attenuation
+  m_MixLevel: 510d1b8950407544b9fea9d4a52a8e8c
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0

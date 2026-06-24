@@ -58,6 +58,7 @@ public class MidiReader : MonoBehaviour
         Debug.Log($"Midi path set to: {midiPath}");
 
         var loadedNotes = ReadMidiNotes(midiPath, GameManager.instance.BPMmod);
+        Metronome.instance.StartMetronome(GameManager.instance.CurrSongBPM);
         if (requestId != midiLoadRequestId)
         {
             yield break;
@@ -407,6 +408,9 @@ public class MidiReader : MonoBehaviour
                     Length = length
                 });
             }
+
+            var tempo = tempoMap.GetTempoAtTime(new MidiTimeSpan(0));
+            GameManager.instance.CurrSongBPM = (int)(tempo.BeatsPerMinute * BPMmult);
         }
         catch (System.Exception ex)
         {

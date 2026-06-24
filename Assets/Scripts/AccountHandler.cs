@@ -63,11 +63,6 @@ public class AccountHandler : MonoBehaviour
         GameManager.instance.currency = acc.currency;
         DataCollection.instance.TotalTimePlayed = acc.TotalTimePlayed;
         GameManager.instance.loadSettings();
-        GameEvents.LoadAchievements.Invoke();
-        GameManager.instance.playerCurrentQuests = new List<QuestData>();
-        QuestEvents.LoadQuests.Invoke();
-        CosmeticsEvents.LoadCosmetics.Invoke();
-        CosmeticsEvents.LoadEquipped.Invoke(); //wczytywanie cosmetików
         gameObject.SetActive(false);
         if(!GameManager.instance.tutorialCompleted)
         {

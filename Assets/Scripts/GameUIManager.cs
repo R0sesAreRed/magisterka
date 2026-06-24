@@ -13,6 +13,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using static UnityEngine.InputSystem.Controls.AxisControl;
 using static UnityEngine.Rendering.DebugUI;
+using Unity.VisualScripting;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -28,6 +29,7 @@ public class GameUIManager : MonoBehaviour
     public GameObject GameEndMenu;
     public GameObject GamePausedMenu;
     private float healthPoints = 3000;
+    private float comboMeter = 0;
     public FalingNotesSpawner FNS;
 
     private string defaultPauseMenuTitle = string.Empty;
@@ -56,6 +58,8 @@ public class GameUIManager : MonoBehaviour
     public AudioClip loseHP;
     public AudioClip gainHP;
 
+    public GameObject FeedbackTextPrefab;
+
     public float HealthPoints
     {
         get { return healthPoints; }
@@ -66,7 +70,6 @@ public class GameUIManager : MonoBehaviour
                 return;
             if ((healthPoints < 1000 && clamped > 1000) || (healthPoints < 2000 && clamped > 2000) || (healthPoints < 3000 && clamped >= 3000))
             {
-                GameEvents.OnRegainedHp.Invoke(1);
                 audioSource.PlayOneShot(gainHP);
             }
                 healthPoints = clamped;
@@ -97,6 +100,11 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
+    public float ComboMeter
+    {
+        get {  return comboMeter; } 
+        set { comboMeter = value; }
+    }
     public double totalSongTime = 0;
     public double songTimePlayed = 0;
     private int score = 0; //punkty zdobywane w czasie gry
@@ -135,10 +143,6 @@ public class GameUIManager : MonoBehaviour
         {
             ScoreText.SetActive(false);
         }
-        else if(!GameManager.instance.verification)
-        {
-            ScoreText.GetComponent<TMP_Text>().font = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font)?.font;
-        }
         if(!GameManager.instance.progressBarOn)
         {
             ProgressBar.SetActive(false);
@@ -147,38 +151,14 @@ public class GameUIManager : MonoBehaviour
         {
             Feedback.SetActive(false);
         }
-        else if(!GameManager.instance.verification)
-        {
-            Feedback.GetComponent<TMP_Text>().font = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font)?.font;
-        }
-        // if(!GameManager.instance.rewardsAndCosmeticOn)
-        // {
-        //     var fontcosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Font);
-        //     if(fontcosmetic!= null && ScoreText.activeSelf)
-        //     {
-        //         ScoreText.GetComponent<TMP_Text>().font = fontcosmetic.font;
-        //         Feedback.GetComponent<TMP_Text>().font = fontcosmetic.font;
-        //     }
-        //     var backgroundCosmetic = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Background);
-        //     if(backgroundCosmetic!= null && Background.activeSelf)
-        //     {
-        //         Background.GetComponent<Image>().sprite = backgroundCosmetic.sprite;
-        //         Background.GetComponent<Image>().color = backgroundCosmetic.colorWhite;
-        //     }
-        // }
-        if (!GameManager.instance.verification)
-            Background.GetComponent<Image>().sprite = GameManager.instance.playerEquippedCosmetics.Find(c => c.type == CosmeticType.Background)?.sprite;
-
     }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         // If verification was requested before entering this scene, start it automatically
         if (GameManager.instance != null && GameManager.instance.verification)
         {
             Debug.Log("[GameUIManager] Verification flag detected on scene enter — starting verification.");
-            StartVerification();
+            //StartVerification();
         }
         else
         {
@@ -209,54 +189,100 @@ public class GameUIManager : MonoBehaviour
     }
 
 
-    public int CalculateScore(double hitTime, double noteStartTime, double releaseTime, double noteLength, GameManager.NK note) //pobawi� si� tym �eby dobrze czu�o r�nice
+    public int CalculateScore(double hitTime, double noteStartTime, double releaseTime, double noteLength, GameManager.NK note)
     {
         double timeDifference = Mathf.Abs((float)(hitTime - noteStartTime));
-        double releaseDifference = Mathf.Abs((float)(releaseTime - (noteStartTime + noteLength)));
-        Debug.Log($"Nuta {note} r�nica czasu: {timeDifference}, r�nica release: {releaseDifference}");
-        if (timeDifference+releaseDifference <= 0.2f) // idealne trafienie 15
+        //double releaseDifference = Mathf.Abs((float)(releaseTime - (noteStartTime + noteLength)));
+        double lengthDifference = Mathf.Abs((float)(Mathf.Abs((float)(noteStartTime - releaseTime)) - noteLength));
+        Debug.Log($"Nuta {note} r�nica czasu: {timeDifference}, r�nica length: {lengthDifference}");
+        if (timeDifference+ lengthDifference <= 0.3f) // idealne trafienie 15
         {
             //Debug.Log("Perfekcyje trafienie");
             feedbackText.text = "Perfekcyjnie!";
+            StartCoroutine(SpawnFeedbackText(note, "Super!"));
             HealthPoints += 100;
-            GameEvents.OnPerfectHit?.Invoke(1);
-            GameEvents.OnHit?.Invoke(1);
             DataCollection.instance.PerfectNotes++;
             return 100;
         }
-        else if (timeDifference+releaseDifference <= 0.4f) // dobre trafienie 30
+        else if (timeDifference+ lengthDifference <= 0.6f) // dobre trafienie 30
         {
             //Debug.Log("Dobre trafienie");
             feedbackText.text = "Dobrze!";
+            StartCoroutine(SpawnFeedbackText(note, "Dobrze!"));
             HealthPoints += 70;
-            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
-            GameEvents.OnHit?.Invoke(1);
             DataCollection.instance.GoodNotes++;
             return 70;
         }
-        else if (timeDifference + releaseDifference <= 0.6f) // s�abe trafienie 45
+        else if (timeDifference + lengthDifference <= 0.9f) // s�abe trafienie 45
         {
             feedbackText.text = "OK";
+            StartCoroutine(SpawnFeedbackText(note, "OK"));
             //Debug.Log("S�abe trafienie");
             HealthPoints += 50;
-            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
-            GameEvents.OnHit?.Invoke(1);
             DataCollection.instance.OkNotes++;
             return 50;
         }
         else // nietrafienie
         {
             feedbackText.text = "Nietrafione";
+            StartCoroutine(SpawnFeedbackText(note, "Pudło"));
             Debug.Log("Losing hp from " + HealthPoints);
             HealthPoints = Mathf.Round((HealthPoints) / 1000) * 1000;
             Debug.Log("New hp: " + HealthPoints);
-            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitQuality, 0);
-            GameEvents.SetAchievementValue?.Invoke(AchievementRestriction.HitAccuracy, 0);
             DataCollection.instance.MissedNotes++;
             return 0;  
         }
         
     }
+
+    public IEnumerator SpawnFeedbackText(GameManager.NK note, string text)
+    {
+        GameObject key = KeyboardManager.instance.KeysDict[note];
+
+        if (key != null)
+        {
+            float lifetime = 1.5f;
+            float elapsed = 0f;
+            float slideDistance = 50f;
+
+            RectTransform keyRect = key.GetComponent<RectTransform>();
+
+            Vector3 startPosition = key.transform.position
+                                  + new Vector3(0f, keyRect.rect.height / 2f - 30f, 0f);
+
+            Vector3 endPosition = startPosition
+                                + new Vector3(0f, slideDistance, 0f);
+
+            GameObject feedbackObj = Instantiate(
+                FeedbackTextPrefab,
+                startPosition,
+                Quaternion.identity,
+                Feedback.transform
+            );
+
+            TMP_Text feedbackText = feedbackObj.GetComponent<TMP_Text>();
+            feedbackText.text = text;
+
+            Color startColor = feedbackText.color;
+
+            while (elapsed < lifetime)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / lifetime;
+
+                feedbackObj.transform.position = Vector3.Lerp(startPosition, endPosition, t);
+
+                Color currentColor = startColor;
+                currentColor.a = Mathf.Lerp(startColor.a, 0f, t);
+                feedbackText.color = currentColor;
+
+                yield return null;
+            }
+
+            Destroy(feedbackObj);
+        }
+    }
+
 
     public void OnLevelComlete()
     {
@@ -265,46 +291,14 @@ public class GameUIManager : MonoBehaviour
             DataCollection.instance.LevelSuccess = true;
             DataCollection.instance.TotalTimePlayed += totalSongTime;
             AccountUtility.UpdateAccountTimePlayed(totalSongTime);
-            CosmeticsData rewardCosmetic = null;
-            if (GameManager.instance.achievementsOn)
-            {
-                GameEvents.OnCompleteLevel.Invoke(1);
-                if (DataCollection.instance.MissedNotes == 0)
-                    GameEvents.OnCompleteLevelHealthQuality.Invoke(1);
-                GameEvents.OnCompleteLevelQuality.Invoke((int)((DataCollection.instance.PerfectNotes / DataCollection.instance.TotalNotes) * 100));
-            }
-            if (GameManager.instance.questsOn)
-            {
-                QuestEvents.ProgressQuest.Invoke(QuestRestriction.Melodie, 1);
-                QuestEvents.ProgressQuest.Invoke(QuestRestriction.MelodieFinish, 1);
-                if (DataCollection.instance.MissedNotes == 0)
-                    QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.NoMisses, 1);
-                if (DataCollection.instance.TotalNotes * 60 <= score)
-                    QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.Score, 1);
-                QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.PerfectHits, DataCollection.instance.PerfectNotes);
-            }
-            else if (GameManager.instance.shopAndCurrencyOn)
-            {
-                GameManager.instance.currency += 100;
-                AccountUtility.UpdateAccountCurrency(GameManager.instance.currency);
-            }
-            else if (GameManager.instance.rewardsAndCosmeticOn)
-            {
-                var availableCosmetics = GameManager.instance.allCosmetics.FindAll(c => !GameManager.instance.playerCosmetics.Exists(p => p.id == c.id));
-                if (availableCosmetics.Count > 0)
-                {
-                    rewardCosmetic = availableCosmetics[UnityEngine.Random.Range(0, availableCosmetics.Count)];
-                }
-            }
-
-
-
-            TurnOnEndMenu(rewardCosmetic);
+            Metronome.instance.StopMetronome();
+            TurnOnEndMenu();
             DataCollection.instance.SubmitData();
         }
         else
         {
-            TurnOnEndMenu(null);
+            Metronome.instance.StopMetronome();
+            TurnOnEndMenu();
             Debug.LogWarning("Total song time is zero or negative, cannot complete level.");
         }
     }
@@ -312,14 +306,12 @@ public class GameUIManager : MonoBehaviour
     {
         DataCollection.instance.TotalTimePlayed += songTimePlayed;
         AccountUtility.UpdateAccountTimePlayed(songTimePlayed);
-        QuestEvents.ProgressQuest.Invoke(QuestRestriction.Melodie, 1);
-        QuestEvents.SingleLevelProgress.Invoke(QuestRestriction.PerfectHits, DataCollection.instance.PerfectNotes);
-        TurnOnEndMenu(null);
-
+        Metronome.instance.StopMetronome();
+        TurnOnEndMenu();
         DataCollection.instance.SubmitData();
     }
 
-    public void TurnOnEndMenu(CosmeticsData cosm)
+    public void TurnOnEndMenu()
     {
         if (!verificationFlowActive)
         {
@@ -377,16 +369,6 @@ public class GameUIManager : MonoBehaviour
             songSaveSystem.Save(GameManager.instance.importedFiles);
         }
         GameEndMenu.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Wynik: {levelScore:F1}%";
-        if (GameManager.instance.questsOn && GameManager.instance.completedQuests > 0)
-            GameEndMenu.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Ukończono zadania: {GameManager.instance.completedQuests}";
-        else if(GameManager.instance.questsOn && GameManager.instance.completedQuests <= 0)
-            GameEndMenu.transform.GetChild(2).gameObject.SetActive(false);
-        else if (GameManager.instance.shopAndCurrencyOn)
-            GameEndMenu.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = $"Zdobyto walutę: 100$";
-        else if (GameManager.instance.rewardsAndCosmeticOn)
-            GameEndMenu.transform.GetChild(2).GetComponent<TMPro.TextMeshProUGUI>().text = cosm != null ? $"Zdobyto przedmiot kosmetyczny: {cosm.name}" : "Brak nagrody kosmetycznej";
-        else
-            GameEndMenu.transform.GetChild(2).gameObject.SetActive(false);
 
         if (verificationFlowActive)
         {
@@ -851,220 +833,12 @@ public class GameUIManager : MonoBehaviour
         }
 
         // Hide end menu and unpause the game
+        Metronome.instance.ResumeMetronome();
         TurnOffEndMenu();
         GameManager.instance.IsPaused = false;
         
         Debug.Log("[GameUIManager] ReplaySong completed - game is ready to play");
     }
-
-    /// <summary>
-    /// Starts a verification sequence: plays top-3 songs that the player completed most often.
-    /// During verification: quests and achievements are disabled, score and feedback are hidden.
-    /// Uses DataCollection firestore records to pick songs; falls back to completed importedFiles.
-    /// </summary>
-    public void StartVerification()
-    {
-        Debug.Log($"[GameUIManager] StartVerification called. GameManager={(GameManager.instance != null)}, DataCollection={(DataCollection.instance != null)}, importedFiles={(GameManager.instance != null && GameManager.instance.importedFiles != null ? GameManager.instance.importedFiles.Count : -1)}, currentSong={(GameManager.instance != null && GameManager.instance.currentSong != null ? GameManager.instance.currentSong.Title : "(null)")}");
-        StartCoroutine(VerificationCoroutine());
-    }
-
-    private IEnumerator VerificationCoroutine()
-    {
-        if (GameManager.instance == null)
-            yield break;
-
-        Debug.Log("[GameUIManager] VerificationCoroutine entered.");
-
-        verificationFlowActive = true;
-        verificationContinueRequested = false;
-        verificationTransitionInProgress = false;
-        verificationCurrentSongIndex = -1;
-        verificationSongs.Clear();
-        verificationSongBpmMods.Clear();
-
-        GameManager.instance.verify();
-        GameManager.instance.IsPaused = true;
-        if (FNS != null)
-        {
-            FNS.Pause();
-        }
-
-        Debug.Log($"[GameUIManager] Verification init complete. IsPaused={GameManager.instance.IsPaused}, SelectedAccount='{GameManager.instance.SelectedAccount}', importedFiles={(GameManager.instance.importedFiles != null ? GameManager.instance.importedFiles.Count : -1)}");
-
-        // Save original settings so we can restore later
-        bool origAchievements = GameManager.instance.achievementsOn;
-        bool origQuests = GameManager.instance.questsOn;
-        bool origPoints = GameManager.instance.pointsOn;
-
-        // Disable achievements and quests and score display
-        GameManager.instance.achievementsOn = false;
-        GameManager.instance.questsOn = false;
-        GameManager.instance.pointsOn = false;
-        if (ScoreText != null) ScoreText.SetActive(false);
-        if (Feedback != null) Feedback.SetActive(false);
-
-        // Query top 3 successful songs
-        List<string> topTitles = new List<string>();
-        if (DataCollection.instance != null)
-        {
-            Debug.Log("[GameUIManager] Querying top 3 songs from DataCollection.");
-            var task = DataCollection.instance.GetTopSuccessfulSongsAsync(GameManager.instance.SelectedAccount, 3);
-            while (!task.IsCompleted)
-                yield return null;
-            if (task.IsCompletedSuccessfully)
-                topTitles = task.Result;
-            Debug.Log($"[GameUIManager] Top successful songs from DataCollection: {string.Join(", ", topTitles)}");
-        }
-        else
-        {
-            Debug.LogWarning("[GameUIManager] DataCollection.instance is null when requesting verification songs.");
-        }
-
-        // Actively load song catalog in gameplay scene (save file + Resources fallback).
-        Debug.Log($"[GameUIManager] Loading verification song catalog. importedFiles before load={(GameManager.instance.importedFiles != null ? GameManager.instance.importedFiles.Count : -1)}");
-        EnsureVerificationSongCatalogLoaded();
-        Debug.Log($"[GameUIManager] Verification song catalog loaded. importedFiles after load={(GameManager.instance.importedFiles != null ? GameManager.instance.importedFiles.Count : -1)}");
-
-        // Fallback source titles if DB returned none.
-        if ((topTitles == null || topTitles.Count == 0) && GameManager.instance.importedFiles != null)
-        {
-            topTitles = GameManager.instance.importedFiles.Where(s => s.Completed).Take(3).Select(s => s.Title).ToList();
-        }
-
-        if (GameManager.instance.importedFiles != null)
-        {
-            foreach (var title in topTitles)
-            {
-                if (verificationSongs.Count >= 3)
-                    break;
-
-                if (string.IsNullOrWhiteSpace(title))
-                    continue;
-
-                // DB already guarantees completion history; resolve by robust title matching.
-                var song = FindSongByTitleSmart(title);
-
-                if (song == null)
-                    continue;
-
-                bool alreadyAdded = verificationSongs.Any(existing =>
-                    existing != null &&
-                    string.Equals(existing.FilePath, song.FilePath, StringComparison.OrdinalIgnoreCase));
-
-                if (!alreadyAdded)
-                {
-                    verificationSongs.Add(song);
-                }
-            }
-        }
-
-        // Final fallback if DB titles couldn't be mapped to local songs.
-        if (verificationSongs.Count == 0 && GameManager.instance.importedFiles != null)
-        {
-            verificationSongs.AddRange(GameManager.instance.importedFiles.Where(s => s != null && s.Completed).Take(3));
-        }
-
-        if (verificationSongs.Count == 0)
-        {
-            int importedCount = GameManager.instance.importedFiles != null ? GameManager.instance.importedFiles.Count : 0;
-            Debug.LogWarning($"[GameUIManager] Verification could not resolve playable songs. importedFiles count: {importedCount}. DB titles: {string.Join(", ", topTitles)}");
-        }
-
-        Debug.Log($"[GameUIManager] Verification song resolution complete. verificationSongs.Count={verificationSongs.Count}");
-
-        int verificationSongCount = verificationSongs.Count;
-
-        if (verificationSongCount == 0)
-        {
-            GameManager.instance.achievementsOn = origAchievements;
-            GameManager.instance.questsOn = origQuests;
-            GameManager.instance.pointsOn = origPoints;
-            if (ScoreText != null) ScoreText.SetActive(origPoints);
-            if (Feedback != null) Feedback.SetActive(GameManager.instance.hitQualityOn);
-
-            verificationPauseMenuTitle = string.Empty;
-            ApplyPauseMenuState(false);
-            TurnOffPauseMenu();
-            RestoreEndMenuDefaults();
-
-            GameManager.instance.verification = false;
-            verificationFlowActive = false;
-            Debug.Log("[GameUIManager] Verification sequence complete. 0 songs in list");
-            yield break;
-        }
-
-        // Pull and cache BPMmods for all verification songs before first playback.
-        for (int index = 0; index < verificationSongCount; index++)
-        {
-            string title = verificationSongs[index].Title;
-            double bpmValue = 1d;
-
-            Debug.Log($"[GameUIManager] Resolving BPMmod for verification song {index + 1}/{verificationSongCount}: '{title}'");
-
-            if (DataCollection.instance != null)
-            {
-                Task<double> bpmTask = DataCollection.instance.GetMostFrequentBPMmodAsync(
-                    GameManager.instance.SelectedAccount,
-                    title,
-                    1d);
-
-                while (!bpmTask.IsCompleted)
-                    yield return null;
-
-                if (bpmTask.IsCompletedSuccessfully)
-                {
-                    bpmValue = bpmTask.Result;
-                }
-            }
-
-            verificationSongBpmMods[title] = bpmValue;
-            Debug.Log($"[GameUIManager] Cached BPMmod for '{title}': {bpmValue}");
-        }
-
-        // Start first song only after all DB data was loaded.
-    Debug.Log("[GameUIManager] Starting first verification song preparation.");
-        yield return StartCoroutine(PrepareVerificationSong(0));
-
-        // Wait for each end menu. Child(4) button handles switching to the next song.
-        while (verificationCurrentSongIndex < verificationSongCount)
-        {
-            while (GameEndMenu != null && !GameEndMenu.activeSelf)
-            {
-                yield return null;
-            }
-
-            if (verificationCurrentSongIndex >= verificationSongCount - 1)
-            {
-                break;
-            }
-
-            verificationContinueRequested = false;
-            while (!verificationContinueRequested)
-            {
-                yield return null;
-            }
-        }
-
-        // Restore settings
-        GameManager.instance.achievementsOn = origAchievements;
-        GameManager.instance.questsOn = origQuests;
-        GameManager.instance.pointsOn = origPoints;
-        if (ScoreText != null) ScoreText.SetActive(origPoints);
-        if (Feedback != null) Feedback.SetActive(GameManager.instance.hitQualityOn);
-
-        verificationPauseMenuTitle = string.Empty;
-        ApplyPauseMenuState(false);
-        TurnOffPauseMenu();
-        verificationFlowActive = false;
-        RestoreEndMenuDefaults();
-
-        GameManager.instance.verification = false;
-        Debug.Log("[GameUIManager] Verification sequence complete.");
-    }
-
-    /// <summary>
-    /// Resets all GUI and gameplay state for GameUIManager
-    /// </summary>
     private void ResetGameUIState()
     {
         // Reset score

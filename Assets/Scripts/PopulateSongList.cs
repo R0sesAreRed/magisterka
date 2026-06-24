@@ -68,43 +68,41 @@ public class PopulateSongList : MonoBehaviour
             if (item.Level != currentLevel)
             {
                 currentLevel = item.Level;
-                if (GameManager.instance.levelsOn)
+                var sep = Instantiate(LevelSeparator, listParent.transform);
+                var child0 = sep.transform.childCount > 0 ? sep.transform.GetChild(0) : null;
+                if (child0 != null)
                 {
-                    var sep = Instantiate(LevelSeparator, listParent.transform);
-                    var child0 = sep.transform.childCount > 0 ? sep.transform.GetChild(0) : null;
-                    if (child0 != null)
-                    {
-                        var sepText = child0.GetComponent<TMPro.TextMeshProUGUI>();
-                        if (sepText != null)
-                            sepText.text = $"Poziom: {currentLevel}";
-                    }
-                    var progressBarRoot = sep.transform.GetChild(1).gameObject;
-                    bool showProgressBar = GameManager.instance.progressBarOn && currentLevel > 0;
-                    progressBarRoot.SetActive(showProgressBar);
-
-                    if (showProgressBar)
-                    {
-                        int prevLevel = currentLevel - 1;
-                        var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
-                        float progress = 0f;
-
-                        if (prevSongs.Count > 0)
-                        {
-                            if (!GameManager.instance.pointsOn)
-                            {
-                                int completedCount = prevSongs.Count(s => s.Completed);
-                                progress = (float)completedCount / prevSongs.Count;
-                            }
-                            else
-                            {
-                                double sumScores = prevSongs.Sum(s => s.BestScore);
-                                progress = (float)(sumScores / (prevSongs.Count * 50.0));
-                            }
-                        }
-
-                        sep.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = Mathf.Clamp01(progress); //here
-                    }
+                    var sepText = child0.GetComponent<TMPro.TextMeshProUGUI>();
+                    if (sepText != null)
+                        sepText.text = $"Poziom: {currentLevel}";
                 }
+                var progressBarRoot = sep.transform.GetChild(1).gameObject;
+                bool showProgressBar = GameManager.instance.progressBarOn && currentLevel > 0;
+                progressBarRoot.SetActive(showProgressBar);
+
+                if (showProgressBar)
+                {
+                    int prevLevel = currentLevel - 1;
+                    var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
+                    float progress = 0f;
+
+                    if (prevSongs.Count > 0)
+                    {
+                        if (!GameManager.instance.pointsOn)
+                        {
+                            int completedCount = prevSongs.Count(s => s.Completed);
+                            progress = (float)completedCount / prevSongs.Count;
+                        }
+                        else
+                        {
+                            double sumScores = prevSongs.Sum(s => s.BestScore);
+                            progress = (float)(sumScores / (prevSongs.Count * 50.0));
+                        }
+                    }
+
+                    sep.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = Mathf.Clamp01(progress); //here
+                }
+                
             }
 
             var go = Instantiate(songListItemPrefab, listParent.transform);
@@ -116,7 +114,7 @@ public class PopulateSongList : MonoBehaviour
 
             // determine if this level should be interactable based on previous level progress
             bool interactable = true;
-            if (GameManager.instance.levelsOn && item.Level != minLevel)
+            if (item.Level != minLevel)
             {
                 int prevLevel = item.Level - 1;
                 var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
