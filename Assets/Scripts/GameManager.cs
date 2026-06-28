@@ -26,11 +26,16 @@ public class GameManager : MonoBehaviour
     public float songStartTime;
     public int nextNoteIndex; //te dwie nie wiem czy tu powinny by�, na razie tu zostaj�
 
-    public int completedQuests = 0;
+    public bool pointsOn = false; //+
+    public bool progressBarOn = false ; //+
+    public bool hitQualityOn = false; //+
+    public bool comboOn = true; //+
+    public bool perKeyFeedbackOn = true; //+
+    public bool onlyGoodSoundOn = true; //+
+    public bool notesHighlightingOn = true; //+
 
-    public bool pointsOn; //+
-    public bool progressBarOn; //+
-    public bool hitQualityOn; //+
+    public bool gamificationOn;
+
 
     private float Volume;
 
@@ -46,9 +51,6 @@ public class GameManager : MonoBehaviour
     }
     public bool tutorialCompleted = false;
     public bool verification = false;
-    public bool singleSongVerifying = false;
-    public int visibleNotes = 0;
-    public int currency = 0;
     public double BPMmod = 1.0;
     public void verify()
     {

@@ -1,10 +1,22 @@
 fileFormatVersion: 2
-guid: 101ec2aa087815f40a0abc1c9fceeea9
+guid: 8031bacbc63c700469d39940f9963d40
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1155130556757487387
-    second: progressbarsetting_0
+      213: -1140391051702049715
+    second: starsmask_0
+  - first:
+      213: 3029534924654064858
+    second: starsmask_1
+  - first:
+      213: -3175799025045132898
+    second: starsmask_2
+  - first:
+      213: 6796458823523165402
+    second: starsmask_3
+  - first:
+      213: -1950859293525786295
+    second: starsmask_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +49,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -51,7 +63,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 50
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -109,40 +121,27 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: progressbarsetting_0
+      name: starsmask_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1470
-        height: 428
+        width: 200
+        height: 40
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b1faab80f19d70010800000000000000
-      internalID: 1155130556757487387
+      spriteID: d44e34a61648c20f0800000000000000
+      internalID: -1140391051702049715
       vertices: []
       indices: 
       edges: []
@@ -151,7 +150,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 65dfc9cf8edb8094d91c1d136e0fa526
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +160,11 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      progressbarsetting_0: 1155130556757487387
+      starsmask_0: -1140391051702049715
+      starsmask_1: 3029534924654064858
+      starsmask_2: -3175799025045132898
+      starsmask_3: 6796458823523165402
+      starsmask_4: -1950859293525786295
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -24,25 +24,31 @@ poszukać profesjonalnych arii do nauki
 jak zrobic grywalizację konkretnie pod muzykę
 wspominieć o kamerze do sprawdzania rąk w treści
 
-przebieg eksperymentu:
+
 ?
 
 
 do zrobienia:
-- zmienic jak liczone sa punkty
-rework ustawień
+-? zmienic jak liczone sa punkty
 + obsługa per-key text feedback
--> obsługa podświetlania nutek
-zastąpic serduszka combo
-głośność metronomu w ustawieniach i wgl wyczyścic ustawienia
++ obsługa podświetlania nutek
++/- zastąpic serduszka combo
+głośność metronomu i sfx w ustawieniach i wgl wyczyścic ustawienia
 + dodac metronom
 rework zbierania statysyk
-opcja grania dźwieku tylko jak jest dobry
++ opcja grania dźwieku tylko jak jest dobry
 
-rework weryfikacji
++ pozbyć się tutorialu
+pozbyć sie podświetlania klawiszy na czerwono
 zobaczyć jak trudno zrobić poprawny syntezator pianina
 + rework missowania nut <-- to na koniec
 rework wyglądu menu <---- to jeszcze bardziej na koniec
 
 
 
+przebieg eksperymentu:
+akompaniament?
+0-1 grywalizacja
+6 utworów 2 proste, 2 średie, 2 trudne -> wyszukać 
+bez ograniczania czasu
+spowalnianie

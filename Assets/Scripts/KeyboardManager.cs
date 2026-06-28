@@ -181,6 +181,8 @@ public class KeyboardManager : MonoBehaviour
             Debug.Log(overlapResults.Length + " " + overlapResults[0].gameObject.name);
             Debug.Log("Setting hit to true for note " + note);
             overlapResults[0].gameObject.GetComponent<FallingNote>().hit = true;
+            if (GameManager.instance.notesHighlightingOn)
+                overlapResults[0].gameObject.GetComponent<Image>().color = Color.green;
         }
         if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
         {
@@ -206,6 +208,8 @@ public class KeyboardManager : MonoBehaviour
             Debug.Log(overlapResults.Length + " " + overlapResults[0].gameObject.name);
             Debug.Log("Setting hit to true for note " + note);
             overlapResults[0].gameObject.GetComponent<FallingNote>().hit = true;
+            if (GameManager.instance.notesHighlightingOn)
+                overlapResults[0].gameObject.GetComponent<Image>().color = Color.red;
         }
 
         if (activeNoteTimings.TryGetValue(note, out var timing) && timing.hitTime.HasValue && !timing.scored)
@@ -260,12 +264,14 @@ public class KeyboardManager : MonoBehaviour
     private void KeyPressColor(InputAction.CallbackContext context, GameManager.NK note)
     {
         isKeyPressed[note] = true;
-        UpdateKeyColor(note);
+        if (GameManager.instance.notesHighlightingOn)
+            UpdateKeyColor(note);
     }
     private void KeyReleaseColor(InputAction.CallbackContext context, GameManager.NK note)
     {
         isKeyPressed[note] = false;
-        UpdateKeyColor(note);
+        if (GameManager.instance.notesHighlightingOn)
+            UpdateKeyColor(note);
     }
 
     private Color ComputeKeyColor(GameManager.NK note)

@@ -4,21 +4,7 @@ public class SceneRouter : MonoBehaviour
 {
     public void LoadScene(string sceneName)
     {
-        if(GameManager.instance.tutorialCompleted)
-        {
             Debug.Log($"Loading scene: {sceneName}");
             UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
-        }
-
-    }
-
-    public void LoadSceneTutorial(string sceneName)
-    {
-        if (!GameManager.instance.tutorialCompleted)
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene(sceneName);
-            TutorialRoute.instance.currentTutorialStep++;
-        }
-
     }
 }

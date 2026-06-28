@@ -11,8 +11,6 @@ public class PopulateSongList : MonoBehaviour
     public GameObject SelectGamemodeMenu;
     void Start()
     {
-        // Wczytaj list� tylko raz na start
-        GameManager.instance.singleSongVerifying = false;
         GameManager.instance.importedFiles = saveSystem.Load();
         AddMissingSongsFromFolder();
         RefreshList();
@@ -38,16 +36,6 @@ public class PopulateSongList : MonoBehaviour
             saveSystem.Save(GameManager.instance.importedFiles);
         }
     }
-    public void setValuesForLearn()
-    {
-        GameManager.instance.singleSongVerifying = false;
-    }
-    public void SetValuesForVerification()
-    {
-        GameManager.instance.visibleNotes = 5;
-        GameManager.instance.singleSongVerifying = true;
-    }
-
     public void RefreshList()
     {
         foreach (Transform child in listParent.transform)
@@ -60,7 +48,6 @@ public class PopulateSongList : MonoBehaviour
 
         int minLevel = sorted.Min(x => x.Level);
         int currentLevel = int.MinValue;
-        bool tutorialActive = GameManager.instance != null && !GameManager.instance.tutorialCompleted;
         bool firstTutorialSong = true;
 
         foreach (var item in sorted)
@@ -136,28 +123,6 @@ public class PopulateSongList : MonoBehaviour
             }
 
             var btn = go.GetComponent<UnityEngine.UI.Button>();
-            if (btn != null)
-            {
-                if (tutorialActive)
-                {
-                    btn.interactable = firstTutorialSong;
-                    if (firstTutorialSong)
-                    {
-                        btn.onClick.AddListener(() =>
-                        {
-                            if (TutorialRoute.instance != null)
-                            {
-                                TutorialRoute.instance.nextStepByValue(16);
-                            }
-                        });
-                        firstTutorialSong = false;
-                    }
-                }
-                else
-                {
-                    btn.interactable = interactable;
-                }
-            }
 
             go.GetComponent<SelectSongItemView>().Initialize(item, this, saveSystem);
 

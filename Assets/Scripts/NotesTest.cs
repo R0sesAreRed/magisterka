@@ -90,16 +90,21 @@ public class NotesTest : MonoBehaviour
 
     private void OnNotePerformed(GameManager.NK note, InputAction.CallbackContext ctx) //rozpoczyna granie nuty przy wciœniêciu klawisza do przypiêcia
     {
-        if(true) //setting od rodzaju graia nut
+        if(GameManager.instance.onlyGoodSoundOn) //setting od rodzaju graia nut
         {
             if (KeyboardManager.instance.hasActiveCollision[note])
-                PlayNote(ctx, note, noteFreq[note]);
+                StartCoroutine(PlayNoteWhenRight(ctx, note, noteFreq[note]));
         }
         else
             PlayNote(ctx, note, noteFreq[note]);
     }
     private void OnNoteCanceled(GameManager.NK note, InputAction.CallbackContext ctx) //zatrzymuje gran¹ nutê przy wypuszczeniu klawisza do przypiêcia
     {
+        if (GameManager.instance.onlyGoodSoundOn) //setting od rodzaju graia nut
+        {
+            StopCoroutine(PlayNoteWhenRight(ctx, note, noteFreq[note]));
+        }
+
         StopNote(ctx, note);
     }
 
@@ -111,7 +116,24 @@ public class NotesTest : MonoBehaviour
             ASsDict[note] = gameObject.AddComponent<AudioSource>();
             ASsDict[note].loop = true;
         }
-        ASsDict[note].clip = noteClips[note]; // u¿yj gotowego klipu
+        ASsDict[note].clip = noteClips[note];
+        ASsDict[note].Play();
+    }
+
+    private IEnumerator PlayNoteWhenRight(InputAction.CallbackContext context, GameManager.NK note, float freq)
+    {
+
+        while (!KeyboardManager.instance.hasActiveCollision[note])
+        {
+            yield return new WaitForSeconds(0.03f);
+        }
+        if (ASsDict[note] == null)
+        {
+            ASsDict[note] = gameObject.AddComponent<AudioSource>();
+            ASsDict[note].loop = true;
+        }
+
+        ASsDict[note].clip = noteClips[note];
         ASsDict[note].Play();
     }
 

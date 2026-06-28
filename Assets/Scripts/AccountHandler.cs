@@ -59,16 +59,9 @@ public class AccountHandler : MonoBehaviour
     {
         GameManager.instance.SelectedAccount = acc.AccountName;
         GameManager.instance.volume = acc.Volume;
-        GameManager.instance.tutorialCompleted = acc.TutorialCompleted;
-        GameManager.instance.currency = acc.currency;
         DataCollection.instance.TotalTimePlayed = acc.TotalTimePlayed;
         GameManager.instance.loadSettings();
         gameObject.SetActive(false);
-        if(!GameManager.instance.tutorialCompleted)
-        {
-            UnityEngine.SceneManagement.SceneManager.LoadScene("Settings");
-            TutorialRoute.instance.currentTutorialStep = 0; 
-        }
     }
 }
 

@@ -92,7 +92,6 @@
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleOpenFileTextMultiple.cs" />
     <Compile Include="Assets\Scripts\TutorialRoute.cs" />
     <Compile Include="Assets\Scripts\FalingNotesSpawner.cs" />
-    <Compile Include="Assets\Scripts\TutorialPopup.cs" />
     <Compile Include="Assets\Scripts\SongSaveSystem.cs" />
     <Compile Include="Assets\StandaloneFileBrowser\Sample\CanvasSampleSaveFileImage.cs" />
     <Compile Include="Assets\Scripts\GameManager.cs" />
@@ -125,7 +124,6 @@
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
-    <None Include="Assets\plan semestr letni.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\Melanchall\DryWetMIDI\Melanchall.DryWetMidi.xml" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />

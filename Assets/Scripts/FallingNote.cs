@@ -9,7 +9,7 @@ public class FallingNote : MonoBehaviour
     public float noteStartTime; // w sekundach od startu utworu
     public float noteLength;    // w sekundach
     private float fallSpeed;     // px/s
-    private float spawnY;        // pozycja Y, z której nuta startuje
+    private float spawnY;        // pozycja Y, z ktï¿½rej nuta startuje
     private float destroyY = -4000f; //temporary
 
     private BoxCollider2D noteCollider;
@@ -25,7 +25,7 @@ public class FallingNote : MonoBehaviour
     }
 
 
-    void Update() //rusza nut¹ w dó³ na podstawie czasu jaki mina³ od poprzedniej klatki (nie zale¿nie od frameratu)
+    void Update() //rusza nutï¿½ w dï¿½ na podstawie czasu jaki minaï¿½ od poprzedniej klatki (nie zaleï¿½nie od frameratu)
     {
         if (GameManager.instance.IsPaused)
             return;
@@ -48,7 +48,13 @@ public class FallingNote : MonoBehaviour
         if(KeyboardManager.instance.isKeyPressed[myNote] == true)
         {
             Debug.Log("Setting hit to true for note " + myNote);
+            if(GameManager.instance.notesHighlightingOn)
+                gameObject.GetComponent<Image>().color = UnityEngine.Color.green;
             hit = true;
+        }
+        else if(GameManager.instance.notesHighlightingOn)
+        {
+            gameObject.GetComponent<Image>().color = UnityEngine.Color.red;
         }
     }
 
@@ -72,11 +78,12 @@ public class FallingNote : MonoBehaviour
 
             }
             if(chordHandler)
-            {
-                GameUIManager.instance.HealthPoints -= 1000;
-                GameUIManager.instance.audioSource.PlayOneShot(GameUIManager.instance.loseHP);
-                if (GameManager.instance.singleSongVerifying)
-                       KeyboardManager.instance.SetAllFallingNoteColorsToWhite();
+            {   
+                if(!GameManager.instance.comboOn)
+                {
+                    GameUIManager.instance.HealthPoints -= 1000;
+                    GameUIManager.instance.audioSource.PlayOneShot(GameUIManager.instance.loseHP);
+                }
                 //combo tutaj ig 
             }
 

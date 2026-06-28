@@ -27,10 +27,6 @@ public class FalingNotesSpawner : MonoBehaviour
             GameManager.instance.nextNoteIndex = 0;
             Debug.Log("[FalingNotesSpawner] songStartTime set to " + GameManager.instance.songStartTime);
         }
-        if(!GameManager.instance.tutorialCompleted)
-        {
-            Pause();
-        }
     }
 
     private IEnumerator Start() //UI zajmuje troche czasu u�ozenie sie po pocz�tku sceny
@@ -132,14 +128,6 @@ public class FalingNotesSpawner : MonoBehaviour
         var fallingNote = noteObj.GetComponent<FallingNote>();
         if (fallingNote != null)
             fallingNote.Init(noteData.Note, noteData.StartTime, noteData.Length, 0);
-
-        if((GameManager.instance.singleSongVerifying || GameManager.instance.verification))
-        {
-            float visibility = ((float)GameManager.instance.visibleNotes / 5.0f);
-            noteRect.GetComponent<Image>().color = new Color(1f, 1f, 1f, visibility);
-            Debug.Log("pozostało widocznych nut " + GameManager.instance.visibleNotes + " widoczność " + visibility);
-            GameManager.instance.visibleNotes--;
-        }
     }
     public IEnumerator LogWhenNoteShouldBePlayed(GameManager.Notes noteData)
     {
