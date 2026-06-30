@@ -9,6 +9,11 @@ public class Metronome : MonoBehaviour
     private bool isRunning = false;
     private double nextTickTime;
     private double secondsPerBeat;
+
+    private double scaledDspTime;
+    private double lastRealDspTime;
+
+    public float tempoScale = 1f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
@@ -22,35 +27,53 @@ public class Metronome : MonoBehaviour
         }
     }
 
+
+    private void Start()
+    {
+        lastRealDspTime = AudioSettings.dspTime;
+    }
+
     private void Update()
     {
+        UpdateScaledDspTime();
+
         if (!isRunning)
             return;
 
         double currentTime = AudioSettings.dspTime;
 
-        if (currentTime >= nextTickTime)
+        if (scaledDspTime >= nextTickTime)
         {
             Tick();
 
-            // Schedule the next beat using audio-clock time, not frame time
             nextTickTime += secondsPerBeat;
 
-            // Safety catch-up in case of a large frame hitch
-            while (nextTickTime <= currentTime)
+            while (nextTickTime <= scaledDspTime)
             {
                 nextTickTime += secondsPerBeat;
             }
         }
     }
 
+    private void UpdateScaledDspTime()
+    {
+        double realDspTime = AudioSettings.dspTime;
+        double realDelta = realDspTime - lastRealDspTime;
+
+        lastRealDspTime = realDspTime;
+
+        scaledDspTime += realDelta * tempoScale;
+    }
 
     public void StartMetronome(int newBpm)
     {
         bpm = Mathf.Max(1, newBpm);
-
         secondsPerBeat = 60.0 / bpm;
-        nextTickTime = AudioSettings.dspTime;
+
+        scaledDspTime = 0.0;
+        lastRealDspTime = AudioSettings.dspTime;
+
+        nextTickTime = scaledDspTime;
 
         isRunning = true;
     }
@@ -60,11 +83,14 @@ public class Metronome : MonoBehaviour
         isRunning = false;
     }
 
+
     public void ResumeMetronome()
     {
-        nextTickTime = AudioSettings.dspTime + secondsPerBeat;
+        lastRealDspTime = AudioSettings.dspTime;
+        nextTickTime = scaledDspTime + secondsPerBeat;
         isRunning = true;
     }
+
     public void SetBpm(int newBpm)
     {
         bpm = Mathf.Max(1, newBpm);

@@ -19,36 +19,32 @@ zbierać dane ze wszystkich klinięć, nie tylko z jakości poprawnych/nietrafio
 standaryzacja czasu ćwiczeń konkretnej melodii przed weryfikacją
 grupa kontrolna (?)
 
-
 poszukać profesjonalnych arii do nauki
 jak zrobic grywalizację konkretnie pod muzykę
 wspominieć o kamerze do sprawdzania rąk w treści
 
 
-?
-
 
 do zrobienia:
--? zmienic jak liczone sa punkty
++ zmienic jak liczone są punkty
 + obsługa per-key text feedback
 + obsługa podświetlania nutek
-+/- zastąpic serduszka combo
-głośność metronomu i sfx w ustawieniach i wgl wyczyścic ustawienia
++ zastąpic serduszka combo
++ głośność metronomu i sfx w ustawieniach i wgl wyczyścic ustawienia
 + dodac metronom
-rework zbierania statysyk
 + opcja grania dźwieku tylko jak jest dobry
-
 + pozbyć się tutorialu
-pozbyć sie podświetlania klawiszy na czerwono
-zobaczyć jak trudno zrobić poprawny syntezator pianina
++ pozbyć sie podświetlania klawiszy na czerwono
 + rework missowania nut <-- to na koniec
++? 0-1 grywalizacja perma do melodii <- losowanie
++ rework odblokowywania poziomów i wyglądu listy (gwiazdki)
++ rework zbierania statysyk -> nietrafione
+
++ spowalnianie
+zobaczyć jak trudno zrobić poprawny syntezator pianina
 rework wyglądu menu <---- to jeszcze bardziej na koniec
-
-
 
 przebieg eksperymentu:
 akompaniament?
-0-1 grywalizacja
 6 utworów 2 proste, 2 średie, 2 trudne -> wyszukać 
 bez ograniczania czasu
-spowalnianie

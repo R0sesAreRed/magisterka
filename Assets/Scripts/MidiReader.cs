@@ -74,6 +74,7 @@ public class MidiReader : MonoBehaviour
 
         GameManager.instance.CurrMidiNotes = CleanUpMidi(loadedNotes);
         DataCollection.instance.TotalNotes = GameManager.instance.CurrMidiNotes.Count;
+        GameUIManager.instance.maxScore = GameUIManager.instance.CalculateMaxScore();
         midiInitialized = true;
         //foreach (var note in GameManager.instance.CurrMidiNotes)
         //{
@@ -147,13 +148,10 @@ public class MidiReader : MonoBehaviour
         if (result.Count == 0)
         {
             GameUIManager.instance.totalSongTime = 0;
-            GameManager.instance.longestNoteLength = 0;
             return result;
         }
 
         GameUIManager.instance.totalSongTime = result.Last().StartTime + result.Last().Length + 1500; //ustaw czas trwania piosenki na czas zako�czenia ostatniej nuty
-        GameManager.instance.longestNoteLength = (float)result.Max(n => n.Length); //ustaw d�ugo�� najd�u�szej nuty
-        //Debug.Log("longest note" + GameManager.instance.longestNoteLength);
         return result;
     }
 

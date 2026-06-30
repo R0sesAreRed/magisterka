@@ -5,11 +5,11 @@ public class SelectSongItemData
 {
     public string Title;
     public string FilePath;
-    public double BestScore;
+    public float BestScore;
     public int Level;
     public bool Completed;
     public bool added;
-    public string LevelSettings;
+    public bool GamificationOn;
     public float LevelTimePlayed;
 
     public SelectSongItemData(SelectSongItem item)
@@ -20,7 +20,7 @@ public class SelectSongItemData
         Level = item.Level;
         Completed = item.Completed;
         added = item.added;
-        LevelSettings = item.LevelSettings;
+        GamificationOn = item.GamificationOn;
         LevelTimePlayed = item.LevelTimePlayed;
     }
 
@@ -33,7 +33,7 @@ public class SelectSongItemData
         item.Level = Level;
         item.Completed = Completed;
         item.added = added;
-        item.LevelSettings = LevelSettings;
+        item.GamificationOn = GamificationOn;
         item.LevelTimePlayed = LevelTimePlayed;
         return item;
     }

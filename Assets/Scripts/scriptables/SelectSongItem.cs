@@ -6,11 +6,11 @@ public class SelectSongItem : ScriptableObject
 {
     public string Title;
     public string FilePath;
-    public double BestScore;
+    public float BestScore;
     public int Level;
     public bool Completed;
     public bool added = false;
-    public string LevelSettings = "00000000"; //9  
+    public bool GamificationOn = false;
     public float LevelTimePlayed = 0;
 }
 

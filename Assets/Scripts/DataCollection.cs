@@ -11,7 +11,7 @@ using UnityEngine;
 public class DataCollection : MonoBehaviour
 {
     [Header("Firebase Firestore")]
-    [SerializeField] private string firestoreCollectionName = "gameRuns";
+    [SerializeField] private string firestoreCollectionName = "gameRunsRevised";
     [SerializeField] private bool signInAnonymously = true;
     [SerializeField] private bool initializeOnStart = true;
 
@@ -30,6 +30,7 @@ public class DataCollection : MonoBehaviour
     public int OkNotes = 0;
     public int GoodNotes = 0;
     public int PerfectNotes = 0;
+    public int WrongNotes = 0;
     public double TotalTimePlayed = 0;
     public bool LevelSuccess = false;
 
@@ -56,13 +57,13 @@ public class DataCollection : MonoBehaviour
         public int OkNotes;
         public int GoodNotes;
         public int PerfectNotes;
+        public int WrongNotes;
         public double TotalTimePlayed;
         public bool LevelSuccess;
-        public string SettingsString;
+        public bool GamificationActive;
         public string SubmitionTime;
         public int AttemptCount;
         public string LastError;
-        public bool SingleSongVerification;
     }
 
     [Serializable]
@@ -207,14 +208,12 @@ public class DataCollection : MonoBehaviour
             OkNotes = OkNotes,
             GoodNotes = GoodNotes,
             PerfectNotes = PerfectNotes,
+            WrongNotes = WrongNotes,
             TotalTimePlayed = TotalTimePlayed,
             LevelSuccess = LevelSuccess,
-            SettingsString = BuildSettingsString(),
+            GamificationActive = GameManager.instance.gamificationOn,
             SubmitionTime = System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-            AttemptCount = 0,
             LastError = string.Empty
-            ,
-            SingleSongVerification = GameManager.instance != null ? GameManager.instance.singleSongVerifying || GameManager.instance.verification : false
         };
     }
 
@@ -294,12 +293,11 @@ public class DataCollection : MonoBehaviour
             { "OkNotes", record.OkNotes },
             { "GoodNotes", record.GoodNotes },
             { "PerfectNotes", record.PerfectNotes },
+            { "WrongNotes", record.WrongNotes },
             { "TotalTimePlayed", record.TotalTimePlayed },
             { "LevelSuccess", record.LevelSuccess },
-            { "SettingsString", record.SettingsString },
-            { "SingleSongVerification", record.SingleSongVerification },
+            { "SettingsString", record.GamificationActive },
             { "SubmitionTime", record.SubmitionTime },
-            { "AttemptCount", record.AttemptCount }
         };
     }
 
@@ -393,27 +391,6 @@ public class DataCollection : MonoBehaviour
         return $"{accountPart}_{songPart}_{timestampPart}_{randomPart}";
     }
 
-    private string BuildSettingsString()
-    {
-        GameManager gm = GameManager.instance;
-
-        if (gm == null)
-        {
-            return "111111111";
-        }
-        return "00000000";
-
-        //return (gm.pointsOn ? "1" : "0") +
-        //    (gm.progressBarOn ? "1" : "0") +
-        //    (gm.hitQualityOn ? "1" : "0") +
-        //    (gm.achievementsOn ? "1" : "0") +
-        //    (gm.shopAndCurrencyOn ? "1" : "0") +
-        //    (gm.rewardsAndCosmeticOn ? "1" : "0") +
-        //    (gm.questsOn ? "1" : "0") +
-        //    (gm.leaderBoardOn ? "1" : "0") +
-        //    (gm.levelsOn ? "1" : "0");
-    }
-
     private string SanitizeDocumentId(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -436,6 +413,7 @@ public class DataCollection : MonoBehaviour
         OkNotes = 0;
         GoodNotes = 0;
         PerfectNotes = 0;
+        WrongNotes = 0;
         LevelSuccess = false;
     }
 

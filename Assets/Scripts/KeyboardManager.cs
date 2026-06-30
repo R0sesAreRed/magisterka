@@ -7,6 +7,8 @@ using System;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using static KeyboardManager;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class KeyboardManager : MonoBehaviour
 {
@@ -59,6 +61,7 @@ public class KeyboardManager : MonoBehaviour
             KeyVisualsDict[(GameManager.NK)i] = Keys[i].transform.GetChild(0).gameObject;
             keyDefaultColors[(GameManager.NK)i] = KeyVisualsDict[(GameManager.NK)i].GetComponent<Image>().color;
             isKeyPressed[(GameManager.NK)i] = false;
+            hasActiveCollision[(GameManager.NK)i] = false;
             var detector = Keys[i].GetComponent<KeyCollisionDetector>();
             if (detector != null)
             {
@@ -77,6 +80,58 @@ public class KeyboardManager : MonoBehaviour
     private void Start()
     {
         StartCoroutine(InitializeNoteTimingsWhenReady());
+    }
+
+    private float slowdownTimer = 0;
+    private void Update()
+    {
+        if(GameManager.instance.gamificationOn)
+        {
+            if(CheckForSpeedup() && Time.timeScale < 1f)
+            {
+                slowdownTimer = 0;
+                Time.timeScale = Mathf.Lerp(Time.timeScale, 1.0f, Time.unscaledDeltaTime * 2f);
+                Metronome.instance.tempoScale = Time.timeScale;
+                //GameManager.instance.audioSource.pitch = 1.5f;
+            }
+            else if (CheckForSlowdown() && Time.timeScale > 0.25f)
+            {
+                slowdownTimer += Time.unscaledDeltaTime;
+                if(slowdownTimer > 0.1f)
+                {    
+                    Time.timeScale = Mathf.Lerp(Time.timeScale, 0.25f, Time.unscaledDeltaTime * 2f);
+                    Metronome.instance.tempoScale = Time.timeScale;
+                }
+                //GameManager.instance.audioSource.pitch = 0.5f;
+            }
+            else
+            {
+                slowdownTimer = 0f;
+            }
+        }
+    }
+
+    private bool CheckForSpeedup()
+    {
+        foreach(var pair in hasActiveCollision)
+        {
+            if(pair.Value && isKeyPressed[pair.Key])
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    private bool CheckForSlowdown()
+    {
+        foreach (var pair in hasActiveCollision)
+        {
+            if (pair.Value && !isKeyPressed[pair.Key])
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private IEnumerator InitializeNoteTimingsWhenReady()
@@ -161,7 +216,7 @@ public class KeyboardManager : MonoBehaviour
         foreach (var timing in queue)
         {
             // Za��my, �e nuta jest aktywna, je�li jej startTime <= currentTime < startTime + noteLength + tolerancja
-            if (!timing.scored && currentTime >= timing.noteStartTime && currentTime <= timing.noteStartTime + timing.noteLength)
+            if (!timing.scored && currentTime >= timing.noteStartTime - 0.5 && currentTime <= timing.noteStartTime + timing.noteLength + 0.5) //<- 500 ms?
             {
                 return timing;
             }
@@ -179,9 +234,9 @@ public class KeyboardManager : MonoBehaviour
         if (overlapResults[0] != null)
         {
             Debug.Log(overlapResults.Length + " " + overlapResults[0].gameObject.name);
-            Debug.Log("Setting hit to true for note " + note);
+            //Debug.Log("Setting hit to true for note " + note);
             overlapResults[0].gameObject.GetComponent<FallingNote>().hit = true;
-            if (GameManager.instance.notesHighlightingOn)
+            if (GameManager.instance.gamificationOn)
                 overlapResults[0].gameObject.GetComponent<Image>().color = Color.green;
         }
         if (noteTimings.TryGetValue(note, out var queue) && queue.Count > 0)
@@ -206,9 +261,8 @@ public class KeyboardManager : MonoBehaviour
         if (overlapResults[0] != null)
         {
             Debug.Log(overlapResults.Length + " " + overlapResults[0].gameObject.name);
-            Debug.Log("Setting hit to true for note " + note);
             overlapResults[0].gameObject.GetComponent<FallingNote>().hit = true;
-            if (GameManager.instance.notesHighlightingOn)
+            if (GameManager.instance.gamificationOn)
                 overlapResults[0].gameObject.GetComponent<Image>().color = Color.red;
         }
 
@@ -244,6 +298,15 @@ public class KeyboardManager : MonoBehaviour
 
             activeNoteTimings.Remove(note);
         }
+        else
+        {
+            if(GameManager.instance.gamificationOn)
+            {
+                GameUIManager.instance.ComboMeter = Mathf.Round((GameUIManager.instance.ComboMeter / 1000) - 1) * 1000;
+                StartCoroutine(GameUIManager.instance.SpawnFeedbackText(note, "Pudło"));
+            }
+            DataCollection.instance.WrongNotes++;
+        }
     }
     public class NoteTiming
     {
@@ -264,14 +327,12 @@ public class KeyboardManager : MonoBehaviour
     private void KeyPressColor(InputAction.CallbackContext context, GameManager.NK note)
     {
         isKeyPressed[note] = true;
-        if (GameManager.instance.notesHighlightingOn)
-            UpdateKeyColor(note);
+        UpdateKeyColor(note);
     }
     private void KeyReleaseColor(InputAction.CallbackContext context, GameManager.NK note)
     {
         isKeyPressed[note] = false;
-        if (GameManager.instance.notesHighlightingOn)
-            UpdateKeyColor(note);
+        UpdateKeyColor(note);
     }
 
     private Color ComputeKeyColor(GameManager.NK note)
@@ -280,21 +341,10 @@ public class KeyboardManager : MonoBehaviour
         bool collisionActive = hasActiveCollision.ContainsKey(note) && hasActiveCollision[note];
 
         // Key pressed + collision active = gray (correct timing)
-        if (keyPressed && collisionActive)
+        if (keyPressed)
         {
             return Color.gray;
         }
-        // Key pressed + no collision = muted red (wrong timing, key pressed when no note present)
-        else if (keyPressed && !collisionActive)
-        {
-            return new Color(1f, 0.4f, 0.4f); // Muted red
-        }
-        // Collision active + key not pressed = muted red (late/missed, note present but key not pressed)
-        else if (!keyPressed && collisionActive)
-        {
-            return new Color(1f, 0.4f, 0.4f); // Muted red
-        }
-        // Neither = return to key's default color (white for white keys, black for black keys)
         else
         {
             return keyDefaultColors.ContainsKey(note) ? keyDefaultColors[note] : Color.white;
@@ -419,7 +469,7 @@ public class KeyboardManager : MonoBehaviour
         
         // Reset key press states
         //isKeyPressed.Clear();
-        hasActiveCollision.Clear();
+        //hasActiveCollision.Clear();
         //lastCollisionTime.Clear();
         lastKeyPressTime.Clear();
         activeNoteTimings.Clear();

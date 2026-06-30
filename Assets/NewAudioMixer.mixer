@@ -1,5 +1,38 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!243 &-9094121180952433211
+AudioMixerGroupController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: SFX
+  m_AudioMixer: {fileID: 24100000}
+  m_GroupID: 4f1100a412706c54c926e7c495484b80
+  m_Children: []
+  m_Volume: acca858038da9024ca0fd710b8623f0e
+  m_Pitch: 775fe5355c608124fb94ea18f93777c3
+  m_Send: 00000000000000000000000000000000
+  m_Effects:
+  - {fileID: -7993860424529313580}
+  m_UserColorIndex: 0
+  m_Mute: 0
+  m_Solo: 0
+  m_BypassEffects: 0
+--- !u!244 &-7993860424529313580
+AudioMixerEffectController:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  m_EffectID: b853ab9569fed59428c2b01cff957f62
+  m_EffectName: Attenuation
+  m_MixLevel: aa52c71c713d63f47a9ca40e007d3e63
+  m_Parameters: []
+  m_SendTarget: {fileID: 0}
+  m_EnableWetMix: 0
+  m_Bypass: 0
 --- !u!244 &-7826394774698515492
 AudioMixerEffectController:
   m_ObjectHideFlags: 3
@@ -49,15 +82,20 @@ AudioMixerController:
   m_EnableSuspend: 1
   m_UpdateMode: 0
   m_ExposedParameters:
+  - guid: 58e4f47953aacc34ba1c8e5319f3594b
+    name: masterVol
   - guid: 01e631f7b9779d642b96662c11b8ef3c
     name: metronomVol
   - guid: fc7e643062bcd11419b7e53826876c85
-    name: vol
+    name: pianoVol
+  - guid: acca858038da9024ca0fd710b8623f0e
+    name: sfxVol
   m_AudioMixerGroupViews:
   - guids:
     - 8202a88f5ce7b4143b7e0b78d2aa84e4
     - 66e2dffe55d14934b9c00b005145e853
     - 9b47922df82460a48a50303e24b33c62
+    - 4f1100a412706c54c926e7c495484b80
     name: View
   m_CurrentViewIndex: 0
   m_TargetSnapshot: {fileID: 24500006}
@@ -73,6 +111,7 @@ AudioMixerGroupController:
   m_Children:
   - {fileID: -4660919535400883400}
   - {fileID: 5312420843097100249}
+  - {fileID: -9094121180952433211}
   m_Volume: 58e4f47953aacc34ba1c8e5319f3594b
   m_Pitch: c930be3e4e9cdb444b3a985fbe33e781
   m_Send: 00000000000000000000000000000000

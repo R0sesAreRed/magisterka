@@ -1,6 +1,8 @@
+using NUnit.Framework;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class PopulateSongList : MonoBehaviour
 {
@@ -9,11 +11,62 @@ public class PopulateSongList : MonoBehaviour
     [SerializeField] private GameObject LevelSeparator;
     [SerializeField] private SongSaveSystem saveSystem = new SongSaveSystem();
     public GameObject SelectGamemodeMenu;
+    public GameObject disclamerMenu;
     void Start()
     {
         GameManager.instance.importedFiles = saveSystem.Load();
         AddMissingSongsFromFolder();
+        bool initilized = false;
+        foreach(var song in GameManager.instance.importedFiles)
+        {
+            if(song.GamificationOn)
+            {
+                initilized = true;
+                break;
+            }
+        }
+        if(!initilized)
+        {
+            var groups = GameManager.instance.importedFiles.GroupBy(s => s.Level);
+
+            foreach (var group in groups)
+            {
+                List<SelectSongItem> songsInGroup = group.ToList();
+                Shuffle(songsInGroup);
+
+                int trueCount = songsInGroup.Count / 2;
+                if (songsInGroup.Count % 2 == 1 && Random.value > 0.5f)
+                {
+                    trueCount++;
+                }
+
+                for (int i = 0; i < songsInGroup.Count; i++)
+                {
+                    songsInGroup[i].GamificationOn = i < trueCount;
+                }
+            }
+
+            saveSystem.Save(GameManager.instance.importedFiles);
+        }
         RefreshList();
+    }
+    public void disclamerLoading()
+    {
+        if(GameManager.instance.noteClipsCopy.Count == 0)
+        {
+            disclamerMenu.SetActive(true);
+        }
+    }
+
+    private void Shuffle<T>(List<T> list)
+    {
+        for(int i = 0; i < list.Count; i++)
+        {
+            T temp = list[i];
+            int randomIndex = Random.Range(i, list.Count);
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
+        }
     }
 
     public void AddMissingSongsFromFolder()
@@ -48,7 +101,6 @@ public class PopulateSongList : MonoBehaviour
 
         int minLevel = sorted.Min(x => x.Level);
         int currentLevel = int.MinValue;
-        bool firstTutorialSong = true;
 
         foreach (var item in sorted)
         {
@@ -64,32 +116,22 @@ public class PopulateSongList : MonoBehaviour
                         sepText.text = $"Poziom: {currentLevel}";
                 }
                 var progressBarRoot = sep.transform.GetChild(1).gameObject;
-                bool showProgressBar = GameManager.instance.progressBarOn && currentLevel > 0;
-                progressBarRoot.SetActive(showProgressBar);
 
-                if (showProgressBar)
+
+                int prevLevel = currentLevel - 1;
+                var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
+                float progress = 0f;
+
+                if (prevSongs.Count > 0)
                 {
-                    int prevLevel = currentLevel - 1;
-                    var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
-                    float progress = 0f;
-
-                    if (prevSongs.Count > 0)
-                    {
-                        if (!GameManager.instance.pointsOn)
-                        {
-                            int completedCount = prevSongs.Count(s => s.Completed);
-                            progress = (float)completedCount / prevSongs.Count;
-                        }
-                        else
-                        {
-                            double sumScores = prevSongs.Sum(s => s.BestScore);
-                            progress = (float)(sumScores / (prevSongs.Count * 50.0));
-                        }
-                    }
-
-                    sep.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = Mathf.Clamp01(progress); //here
+                    double sumScores = prevSongs.Sum(s => s.BestScore);
+                    progress = (float)(sumScores / (prevSongs.Count * 0.75f));
                 }
-                
+                else
+                {
+                    sep.transform.GetChild(1).gameObject.SetActive(false);
+                }
+                sep.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = Mathf.Clamp01(progress);                             
             }
 
             var go = Instantiate(songListItemPrefab, listParent.transform);
@@ -101,32 +143,23 @@ public class PopulateSongList : MonoBehaviour
 
             // determine if this level should be interactable based on previous level progress
             bool interactable = true;
-            if (item.Level != minLevel)
+            if (item.Level != minLevel) // <- odblokowywanie poziomów
             {
                 int prevLevel = item.Level - 1;
                 var prevSongs = sorted.Where(x => x.Level == prevLevel).ToList();
                 if (prevSongs.Count > 0)
                 {
-                    if (!GameManager.instance.pointsOn)
-                    {
-                        // Use Completed flag: more than 50% of songs must be completed
-                        int completedCount = prevSongs.Count(s => s.Completed);
-                        interactable = completedCount > (prevSongs.Count * 0.5);
-                    }
-                    else
-                    {
-                        // Use BestScore: at least 50% of points must be collected in aggregate
-                        double sumScores = prevSongs.Sum(s => s.BestScore);
-                        interactable = sumScores >= (prevSongs.Count * 50.0);
-                    }
+
+                    double sumScores = prevSongs.Sum(s => (float)s.BestScore);
+                    Debug.Log($"Checking if level {item.Level} should be interactable based on previous level {prevLevel} progress: {sumScores} {prevSongs.Count * 0.80f}");
+                    interactable = (sumScores >= (prevSongs.Count * 0.80f));
                 }
+
             }
 
             var btn = go.GetComponent<UnityEngine.UI.Button>();
-
+            btn.interactable = interactable;
             go.GetComponent<SelectSongItemView>().Initialize(item, this, saveSystem);
-
-            // delete button handled inside SelectSongItemView.Initialize (only active for imported items)
         }
 
     }

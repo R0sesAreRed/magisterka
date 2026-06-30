@@ -17,10 +17,10 @@ public class GameManager : MonoBehaviour
     public bool IsPaused = false;
 
     public List<SelectSongItem> importedFiles = new List<SelectSongItem>();
+    public Dictionary<GameManager.NK, AudioClip> noteClipsCopy = new Dictionary<GameManager.NK, AudioClip>();
     [SerializeField] private SongSaveSystem saveSystem;
     [SerializeField] private AudioMixer audiomixer;
     public SelectSongItem currentSong;
-    public float longestNoteLength;
 
 
     public float songStartTime;
@@ -29,46 +29,68 @@ public class GameManager : MonoBehaviour
     public bool pointsOn = false; //+
     public bool progressBarOn = false ; //+
     public bool hitQualityOn = false; //+
-    public bool comboOn = true; //+
-    public bool perKeyFeedbackOn = true; //+
-    public bool onlyGoodSoundOn = true; //+
-    public bool notesHighlightingOn = true; //+
+    // public bool comboOn = true; //+
+    // public bool perKeyFeedbackOn = true; //+
+    // public bool onlyGoodSoundOn = true; //+
+    //public bool notesHighlightingOn = true; //+
 
     public bool gamificationOn;
 
+    public int CurrSongBPM;
+
+
 
     private float Volume;
-
-    public int CurrSongBPM;
     public float volume
     {
         get { return Volume; }
         set
         {
             Volume = value;
-            audiomixer.SetFloat("vol", value == 0 ? -80 : Mathf.Log10(value) * 20);
+            audiomixer.SetFloat("masterVol", value == 0 ? -80 : Mathf.Log10(value) * 20);
         }
     }
+    private float PianoVolume;
+    public float pianoVolume
+    {
+        get { return PianoVolume; }
+        set
+        {
+            PianoVolume = value;
+            audiomixer.SetFloat("pianoVol", value == 0 ? -80 : Mathf.Log10(value) * 20);
+        }
+    }
+    private float MetronomeVolume;
+    public float metronomeVolume
+    {
+        get { return MetronomeVolume; }
+        set
+        {
+            MetronomeVolume = value;
+            audiomixer.SetFloat("metronomVol", value == 0 ? -80 : Mathf.Log10(value) * 20);
+        }
+    }
+    private float SFXVolume;
+    public float sfxVolume
+    {
+        get { return SFXVolume; }
+        set
+        {
+            SFXVolume = value;
+            audiomixer.SetFloat("sfxVol", value == 0 ? -80 : Mathf.Log10(value) * 20);
+        }
+    }
+
+
+
+
     public bool tutorialCompleted = false;
     public bool verification = false;
     public double BPMmod = 1.0;
-    public void verify()
-    {
-        Debug.Log("Verification started");
-        verification = true;
-    }
 
     public string GetPersistSettingsName()
     {
         return SelectedAccount != null ? $"{SelectedAccount}_settings" : "default_settings";
-    }
-
-    public void ParseSettingsString(string settingsString)
-    {
-        Debug.Log(settingsString);
-        pointsOn = settingsString[0] == '1';
-        progressBarOn = settingsString[1] == '1';
-        hitQualityOn = settingsString[2] == '1';
     }
 
     [SerializeField] MainMenuUIMAnager MMUIM;
@@ -85,11 +107,6 @@ public class GameManager : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         MMUIM = FindFirstObjectByType<MainMenuUIMAnager>();
-    }
-    public void loadSettings()
-    {
-        string settingsString = PlayerPrefs.GetString(GetPersistSettingsName(), "111111111");
-        ParseSettingsString(settingsString);
     }
 
     //[SerializeField] TextMeshProUGUI scoreText;
@@ -111,6 +128,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
+        //Time.timeScale = 0.5f;
         if (instance == null && instance != this)
         {
             instance = this;

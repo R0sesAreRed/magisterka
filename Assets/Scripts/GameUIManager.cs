@@ -39,10 +39,12 @@ public class GameUIManager : MonoBehaviour
     public Image ComboBar;
     public TextMeshProUGUI ComboText;
 
-    public GameObject hearthsHolder;
-    public GameObject comboHolder;
+    public Image StarsBar;
+    public GameObject StarsHolder;
 
-    public float ComboMeter                           //obgaddać jak z hp i może dodać tutaj opcję przegrywania
+    public GameObject comboHolder;
+    public GameObject FeedbackTextParent;
+    public float ComboMeter
     {
         get {  return comboMeter; } 
         set 
@@ -55,18 +57,16 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
-
-
-
     public double totalSongTime = 0;
     public double songTimePlayed = 0;
     private int score = 0; //punkty zdobywane w czasie gry
-    private double displayScore = 0; //punkty wy�wietlane na ekranie
+    public int maxScore = 0;
     public int Score
     {
         get { return score; }
         set
         {
+            StarsBar.fillAmount = (float)score / ((float)(maxScore*0.9f));
             score = value;    
         }
     }
@@ -80,34 +80,17 @@ public class GameUIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        if (!GameManager.instance.progressBarOn)
-        {
-            ProgressBar.SetActive(false);
-        }
-
-        if (GameManager.instance.comboOn)
-        {
-            hearthsHolder.SetActive(false);
-            comboHolder.SetActive(true);
-        }
-        else
-        {
-            hearthsHolder.SetActive(true);
-            comboHolder.SetActive(false);
-        }
+        ProgressBar.SetActive(GameManager.instance.gamificationOn);
+        comboHolder.SetActive(GameManager.instance.gamificationOn);
+        StarsHolder.SetActive(GameManager.instance.gamificationOn);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (displayScore < score)
-        {
-            displayScore += 1f; //0.1f
-        }
         if (!GameManager.instance.IsPaused)
         {
             progressBar.fillAmount = (float)(songTimePlayed / totalSongTime);
-            //Debug.Log("[GameUIManager] ProgressBar fill: " + progressBar.fillAmount + " songTimePlayed: " + songTimePlayed + " totalSongTime: " + totalSongTime);
         }
         if (songTimePlayed >= totalSongTime + 1500 && !LevelComplete)
         {
@@ -117,14 +100,25 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
+    public int CalculateMaxScore()
+    {
+        if(GameManager.instance.gamificationOn)
+        {
+            Debug.Log("Max Score for this song : " + (200 + 400 + 600 + 800 + 1000 + (Mathf.Max(DataCollection.instance.TotalNotes - 10) * 600)));
+            return 200 + 400 + 600 + 800 + 1000 + (Mathf.Max(DataCollection.instance.TotalNotes - 10) * 600);
+        }
+        else
+            return DataCollection.instance.TotalNotes * 100;
+        //return 2 + 2 + 2 + 2 + 2 + rest;
+    }
 
     public int CalculateScore(double hitTime, double noteStartTime, double releaseTime, double noteLength, GameManager.NK note)
     {
         double timeDifference = Mathf.Abs((float)(hitTime - noteStartTime));
         //double releaseDifference = Mathf.Abs((float)(releaseTime - (noteStartTime + noteLength)));
-        double lengthDifference = Mathf.Abs((float)(Mathf.Abs((float)(noteStartTime - releaseTime)) - noteLength));
+        double lengthDifference = Mathf.Abs((float)(Mathf.Abs((float)(hitTime - releaseTime)) - noteLength));
         Debug.Log($"Nuta {note} r�nica czasu: {timeDifference}, r�nica length: {lengthDifference}");
-        if (timeDifference+ lengthDifference <= 0.3f) // idealne trafienie 15
+        if (timeDifference+ lengthDifference <= 0.25f) // idealne trafienie 15
         {
 
             if (GameManager.instance.gamificationOn)
@@ -133,9 +127,9 @@ public class GameUIManager : MonoBehaviour
                 ComboMeter += 500;
             }               
             DataCollection.instance.PerfectNotes++;
-            return GameManager.instance.gamificationOn? 100 : 100*comboMult;
+            return GameManager.instance.gamificationOn? 100 * comboMult : 100;
         }
-        else if (timeDifference+ lengthDifference <= 0.6f) // dobre trafienie 30
+        else if (timeDifference+ lengthDifference <= 0.35f) // dobre trafienie 30
         {
             if (GameManager.instance.gamificationOn)
             {
@@ -143,9 +137,9 @@ public class GameUIManager : MonoBehaviour
                 ComboMeter += 350;
             }
             DataCollection.instance.GoodNotes++;
-            return GameManager.instance.gamificationOn ? 70 : 70 * comboMult;
+            return GameManager.instance.gamificationOn ? 70 * comboMult : 70 ;
         }
-        else if (timeDifference + lengthDifference <= 0.9f) // s�abe trafienie 45
+        else if (timeDifference + lengthDifference <= 0.45f) // s�abe trafienie 45
         {
             if (GameManager.instance.gamificationOn)
             {
@@ -153,15 +147,15 @@ public class GameUIManager : MonoBehaviour
                 ComboMeter += 250;
             }        
             DataCollection.instance.OkNotes++;
-            return GameManager.instance.gamificationOn ? 50 : 50 * comboMult;
+            return GameManager.instance.gamificationOn ? 50 * comboMult : 50;
         }
         else // nietrafienie
         {
             if (GameManager.instance.gamificationOn)
             {
                 StartCoroutine(SpawnFeedbackText(note, "Pudło"));
-                comboMeter = Mathf.Round(((comboMeter) / 1000) - 1) * 1000;
-            }                
+                comboMeter = Mathf.Round((comboMeter / 1000) - 1) * 1000; // <- zobaczyć jak działa
+            }
             DataCollection.instance.MissedNotes++;
             return 0;  
         }
@@ -174,6 +168,7 @@ public class GameUIManager : MonoBehaviour
 
         if (key != null)
         {
+            Debug.Log($"Spawning feedback text '{text}' for note {note}");
             float lifetime = 1.5f;
             float elapsed = 0f;
             float slideDistance = 50f;
@@ -189,7 +184,8 @@ public class GameUIManager : MonoBehaviour
             GameObject feedbackObj = Instantiate(
                 FeedbackTextPrefab,
                 startPosition,
-                Quaternion.identity
+                Quaternion.identity,
+                FeedbackTextParent.transform
             );
 
             TMP_Text feedbackText = feedbackObj.GetComponent<TMP_Text>();
@@ -266,10 +262,11 @@ public class GameUIManager : MonoBehaviour
         }
 
         GameEndMenu.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = LevelComplete ? "Wygrana!" : "Przegrana!";
-        double levelScore = DataCollection.instance.TotalNotes > 0
-            ? ((double)score / (double)(DataCollection.instance.TotalNotes * 100)) * 100
-            : 0;
-        Debug.Log("wynik: " + score + ", max wynik: " + DataCollection.instance.TotalNotes * 100 + ", procent: " + levelScore);
+        float levelScore = 0;
+        if (DataCollection.instance.TotalNotes > 0)
+        {
+            levelScore = GameManager.instance.gamificationOn ? ((float)score / (float)(maxScore * 0.9f)) : ((float)score / (float)(DataCollection.instance.TotalNotes * 100));
+        }
         if (GameManager.instance.currentSong != null)
         {
             GameManager.instance.currentSong.BestScore = System.Math.Max(GameManager.instance.currentSong.BestScore, levelScore);
@@ -291,7 +288,7 @@ public class GameUIManager : MonoBehaviour
 
             songSaveSystem.Save(GameManager.instance.importedFiles);
         }
-        GameEndMenu.transform.GetChild(1).GetComponent<TMPro.TextMeshProUGUI>().text = $"Wynik: {levelScore:F1}%";
+        GameEndMenu.transform.GetChild(1).GetChild(0).GetComponent<Image>().fillAmount = levelScore;
 
         GameEndMenu.SetActive(true);
     }
@@ -367,13 +364,14 @@ public class GameUIManager : MonoBehaviour
     {
         // Reset score
         score = 0;
-        displayScore = 0;
-        
         
         // Reset progress bar
         progressBar.fillAmount = 0f;
-        
-        
+        StarsBar.fillAmount = 0f;
+        ComboBar.fillAmount = 0f;
+        ComboMeter = 0;
+        comboMult = 1;
+
         // Reset level completion flag
         LevelComplete = false;
         

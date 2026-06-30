@@ -28,8 +28,7 @@ public class AccountHandler : MonoBehaviour
         AccountUtility.AccountData newAccount = new AccountUtility.AccountData
         {
             AccountName = name,
-            Volume = 1.0f,
-            TutorialCompleted = false
+            MasterVolume = 1.0f,
         };
         accounts.Add(newAccount);
         AccountUtility.SaveAccounts(accounts);
@@ -58,9 +57,11 @@ public class AccountHandler : MonoBehaviour
     public void SelectAccount(AccountUtility.AccountData acc)
     {
         GameManager.instance.SelectedAccount = acc.AccountName;
-        GameManager.instance.volume = acc.Volume;
+        GameManager.instance.volume = acc.MasterVolume;
+        GameManager.instance.pianoVolume = acc.PianoVolume;
+        GameManager.instance.metronomeVolume = acc.MetronomeVolume;
+        GameManager.instance.sfxVolume = acc.SFXVolume;
         DataCollection.instance.TotalTimePlayed = acc.TotalTimePlayed;
-        GameManager.instance.loadSettings();
         gameObject.SetActive(false);
     }
 }
@@ -73,9 +74,10 @@ public static class AccountUtility
     public class AccountData
     {
         public string AccountName;
-        public float Volume;
-        public bool TutorialCompleted = false;
-        public int currency = 0;
+        public float MasterVolume;
+        public float PianoVolume;
+        public float MetronomeVolume;
+        public float SFXVolume;
         public double TotalTimePlayed = 0;
     }
 
@@ -105,52 +107,23 @@ public static class AccountUtility
         Debug.Log("Saved accounts to: " + AccountJsonPath);
     }
 
-    public static void UpdateAccountVolume(float newVolume)
+    public static void UpdateAccountVolume(float newVolume, float newPianoVolume, float newMetronomeVolume, float newSFXVolume)
     {
         var accounts = LoadAccounts();
         foreach (var acc in accounts)
         {
             if (acc.AccountName == GameManager.instance.SelectedAccount)
             {
-                acc.Volume = newVolume;
+                acc.MasterVolume = newVolume;
+                acc.PianoVolume = newPianoVolume;
+                acc.MetronomeVolume = newMetronomeVolume;
+                acc.SFXVolume = newSFXVolume;
                 SaveAccounts(accounts);
-                Debug.Log($"Account '{GameManager.instance.SelectedAccount}' volume updated: {newVolume}");
+                Debug.Log("Saving settings" + newVolume + " " + newPianoVolume + " " + newMetronomeVolume + " " + newSFXVolume + " for account " + GameManager.instance.SelectedAccount);
                 return;
             }
         }
-        Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
-    }
-
-    public static void UpdateAccountTutorialCompleted(bool newTutorialCompleted)
-    {
-        var accounts = LoadAccounts();
-        foreach (var acc in accounts)
-        {
-            if (acc.AccountName == GameManager.instance.SelectedAccount)
-            {
-                acc.TutorialCompleted = newTutorialCompleted;
-                SaveAccounts(accounts);
-                Debug.Log($"Account '{GameManager.instance.SelectedAccount}' tutorialCompleted updated: {newTutorialCompleted}");
-                return;
-            }
-        }
-        Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
-    }
-
-    public static void UpdateAccountCurrency(int newCurrency)
-    {
-        var accounts = LoadAccounts();
-        foreach (var acc in accounts)
-        {
-            if (acc.AccountName == GameManager.instance.SelectedAccount)
-            {
-                acc.currency = newCurrency;
-                SaveAccounts(accounts);
-                Debug.Log($"Account '{GameManager.instance.SelectedAccount}' currency updated: {newCurrency}");
-                return;
-            }
-        }
-        Debug.LogWarning($"Account '{GameManager.instance.SelectedAccount}' not found.");
+        
     }
 
     public static void UpdateAccountTimePlayed(double TimePlayed)

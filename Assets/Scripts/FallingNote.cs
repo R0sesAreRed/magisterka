@@ -47,12 +47,12 @@ public class FallingNote : MonoBehaviour
     {
         if(KeyboardManager.instance.isKeyPressed[myNote] == true)
         {
-            Debug.Log("Setting hit to true for note " + myNote);
-            if(GameManager.instance.notesHighlightingOn)
+            //Debug.Log("Setting hit to true for note " + myNote);
+            if(GameManager.instance.gamificationOn)
                 gameObject.GetComponent<Image>().color = UnityEngine.Color.green;
             hit = true;
         }
-        else if(GameManager.instance.notesHighlightingOn)
+        else if(GameManager.instance.gamificationOn)
         {
             gameObject.GetComponent<Image>().color = UnityEngine.Color.red;
         }
@@ -60,10 +60,10 @@ public class FallingNote : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        Debug.Log("Exiting trigger. hit: " + hit + " chordHandler: " + chordHandler);
+        //Debug.Log("Exiting trigger. hit: " + hit + " chordHandler: " + chordHandler);
         if (KeyboardManager.instance.isKeyPressed[myNote] == true)
         {
-            Debug.Log("Setting hit to true for note " + myNote);
+            //Debug.Log("Setting hit to true for note " + myNote);
             hit = true;
         }
         else if(!hit)
@@ -78,13 +78,9 @@ public class FallingNote : MonoBehaviour
 
             }
             if(chordHandler)
-            {   
-                if(!GameManager.instance.comboOn)
-                {
-                    GameUIManager.instance.HealthPoints -= 1000;
-                    GameUIManager.instance.audioSource.PlayOneShot(GameUIManager.instance.loseHP);
-                }
-                //combo tutaj ig 
+            {
+                GameUIManager.instance.ComboMeter -= 1000; //1 poziom combo w dół
+                DataCollection.instance.MissedNotes++;
             }
 
         }
